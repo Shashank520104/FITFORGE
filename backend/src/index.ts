@@ -1,3 +1,4 @@
+
 import express from "express";
 
 import LoggerMiddleware from "./middlewares/logger.middleware.js";
@@ -6,7 +7,11 @@ import errorMiddleware from "./middlewares/error.middleware.js";
 import userRoutes from "./routes/user.routes.js";
 import workoutRoutes from "./routes/workout.routes.js";
 
+import connectDB from "./config/database.js";
+
 const app = express();
+
+connectDB();
 
 app.use(LoggerMiddleware);
 app.use(express.json());
