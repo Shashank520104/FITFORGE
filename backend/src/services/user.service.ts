@@ -21,14 +21,26 @@ export const getAllUsersService = async (
   filter: object = {},
   sort: string = "",
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  fields: string = ""
 ) => {
   const skip = (page - 1) * limit;
 
-  const users = await User.find(filter)
-    .sort(sort)
+  let query = User.find(filter);
+
+  if (fields) {
+    query = query.select(fields);
+  }
+
+  if (sort) {
+    query = query.sort(sort);
+  }
+
+  query = query
     .skip(skip)
     .limit(limit);
+
+  const users = await query;
 
   return users;
 };

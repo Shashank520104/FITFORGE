@@ -124,7 +124,13 @@ export const getAllUsers = async (
   req: Request,
   res: Response
 ) => {
-  const { sort, page, limit, ...filter } = req.query;
+  const {
+    sort,
+    page,
+    limit,
+    fields,
+    ...filter
+  } = req.query;
 
   const sortValue = typeof sort === "string"
     ? sort
@@ -138,11 +144,16 @@ export const getAllUsers = async (
     ? Number(limit)
     : 10;
 
+  const fieldsValue = typeof fields === "string"
+    ? fields.replace(/,/g, " ")
+    : "";
+
   const users = await getAllUsersService(
     filter,
     sortValue,
     pageValue,
-    limitValue
+    limitValue,
+    fieldsValue
   );
 
   res.status(200).json({
