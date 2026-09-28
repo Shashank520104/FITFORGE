@@ -124,13 +124,17 @@ export const getAllUsers = async (
   req: Request,
   res: Response
 ) => {
-  const {
-    sort,
-    page,
-    limit,
-    fields,
-    ...filter
-  } = req.query;
+const {
+  sort,
+  page,
+  limit,
+  fields,
+  name,
+  minWeight,
+  maxWeight,
+  goals,
+  ...filter
+} = req.query;
 
   const sortValue = typeof sort === "string"
     ? sort
@@ -148,13 +152,17 @@ export const getAllUsers = async (
     ? fields.replace(/,/g, " ")
     : "";
 
-  const users = await getAllUsersService(
-    filter,
-    sortValue,
-    pageValue,
-    limitValue,
-    fieldsValue
-  );
+const users = await getAllUsersService(
+  filter,
+  sortValue,
+  pageValue,
+  limitValue,
+  fieldsValue,
+  typeof name === "string" ? name : "",
+  typeof minWeight === "string" ? Number(minWeight) : undefined,
+  typeof maxWeight === "string" ? Number(maxWeight) : undefined,
+  typeof goals === "string" ? goals : ""
+);
 
   res.status(200).json({
     success: true,

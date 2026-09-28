@@ -22,9 +22,37 @@ export const getAllUsersService = async (
   sort: string = "",
   page: number = 1,
   limit: number = 10,
-  fields: string = ""
+  fields: string = "",
+  name: string = "",
+  minWeight: number | undefined = undefined,
+  maxWeight: number | undefined = undefined,
+  goals: string = ""
 ) => {
   const skip = (page - 1) * limit;
+
+
+ if (name) 
+  {
+  filter = 
+  {
+    ...filter,
+    name: new RegExp(name, "i")
+  };
+}
+
+
+if (goals) {
+  const goalList = goals.split(",");
+
+  filter = {
+    ...filter,
+    goal: {
+      $in: goalList
+    }
+  };
+}
+
+
 
   let query = User.find(filter);
 
