@@ -6,6 +6,7 @@ import errorMiddleware from "./middlewares/error.middleware.js";
 
 import userRoutes from "./routes/user.routes.js";
 import workoutRoutes from "./routes/workout.routes.js";
+import authRotes from "./routes/auth.routes.js";
 
 import connectDB from "./config/database.js";
 
@@ -15,6 +16,7 @@ connectDB();
 
 app.use(LoggerMiddleware);
 app.use(express.json());
+app.use("/api/v1/auth",authRotes);
 
 app.get("/", (req, res) => {
   res.send("Welcome to FITFORGE");
