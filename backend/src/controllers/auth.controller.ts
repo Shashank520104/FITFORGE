@@ -23,3 +23,10 @@ export const loginUser = async (req: Request, res: Response) => {
     data: user
   });
 };
+
+export const getProfile = (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    data: req.user
+  });
+};

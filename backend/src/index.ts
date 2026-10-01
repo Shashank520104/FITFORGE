@@ -18,6 +18,7 @@ app.use(LoggerMiddleware);
 app.use(express.json());
 app.use("/api/v1/auth",authRotes);
 
+
 app.get("/", (req, res) => {
   res.send("Welcome to FITFORGE");
 });

@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const registerUserService = async (data: any) => {
   const existingUser = await User.findOne({
@@ -10,12 +11,12 @@ export const registerUserService = async (data: any) => {
     throw new Error("Email already registered");
   }
 
- const hashedPassword = await bcrypt.hash(data.password, 10);
+  const hashedPassword = await bcrypt.hash(data.password, 10);
 
   const user = await User.create({
     name: data.name,
     email: data.email,
-    password:hashedPassword,
+    password: hashedPassword,
     age: data.age,
     sex: data.sex,
     weight: data.weight,
@@ -23,25 +24,47 @@ export const registerUserService = async (data: any) => {
     goal: data.goal
   });
 
-  return user;
+  const userObject = user.toObject();
+  const { password, ...safeUser } = userObject;
+
+  return safeUser;
 };
 
-export const loginUserService = async (email: string, password: string) => {
+export const loginUserService = async (
+  email: string,
+  password: string
+) => {
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
     throw new Error("Invalid email or password");
   }
 
-const isPasswordCorrect = await bcrypt.compare(
-  password,
-  user.password
+  const isPasswordCorrect = await bcrypt.compare(
+    password,
+    user.password
+  );
+
+  if (!isPasswordCorrect) {
+    throw new Error("Invalid email or password");
+  }
+
+
+  const token = jwt.sign(
+  {
+    userId: user._id
+  },
+  process.env.JWT_SECRET as string,
+  {
+    expiresIn: "1d"
+  }
 );
 
-if (!isPasswordCorrect) {
-  throw new Error("Invalid email or password");
-}
+ const userObject = user.toObject();
+const { password: storedPassword, ...safeUser } = userObject;
 
-user.password = undefined;
-
-return user;
+return {
+  user: safeUser,
+  token
+};
+};
