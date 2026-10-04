@@ -1,0 +1,315 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2033.9900000000002 1924.0249999999999" width="2033.9900000000002" height="1924.0249999999999" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="TIER1" data-label="1. CLIENT TIER">
+  <rect x="167.5" y="538.0000000000001" width="163.611" height="187.60000000000002" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="167.5" y="538.0000000000001" width="163.611" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="179.5" y="552.0000000000001" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">1. CLIENT TIER</text>
+</g>
+<g class="subgraph" data-id="TIER2" data-label="2. INGRESS &amp; EDGE GATEWAY">
+  <rect x="255.60700000000008" y="841.9000000000001" width="270.31499999999994" height="147.60000000000002" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="255.60700000000008" y="841.9000000000001" width="270.31499999999994" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="267.6070000000001" y="855.9000000000001" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">2. INGRESS &amp; EDGE GATEWAY</text>
+</g>
+<g class="subgraph" data-id="TIER3" data-label="3. FITFORGE MODULAR BACKEND (Node.js + TypeScript + Express)">
+  <rect x="40" y="1171.1" width="1825.9900000000002" height="712.925" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="40" y="1171.1" width="1825.9900000000002" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="52" y="1185.1" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">3. FITFORGE MODULAR BACKEND (Node.js + TypeScript + Express)</text>
+<g class="subgraph" data-id="Pipeline" data-label="Middleware Pipeline">
+  <rect x="1121.467" y="1215.1" width="716.523" height="206.05" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="1121.467" y="1215.1" width="716.523" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1133.467" y="1229.1" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Middleware Pipeline</text>
+</g>
+<g class="subgraph" data-id="Core_Services" data-label="Domain Modules">
+  <rect x="68" y="1444.925" width="837.333" height="402.8" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="68" y="1444.925" width="837.333" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="80" y="1458.925" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Domain Modules</text>
+</g>
+<g class="subgraph" data-id="Dispatcher" data-label="Async Job Dispatcher">
+  <rect x="1121.467" y="1449.1499999999999" width="224.373" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="1121.467" y="1449.1499999999999" width="224.373" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1133.467" y="1463.1499999999999" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Async Job Dispatcher</text>
+</g>
+</g>
+<g class="subgraph" data-id="TIER4" data-label="4. PERSISTENCE, CACHE &amp; VECTOR TIER">
+  <rect x="405.36450000000025" y="40" width="322.1849999999999" height="421.7" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="405.36450000000025" y="40" width="322.1849999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="417.36450000000025" y="54" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">4. PERSISTENCE, CACHE &amp; VECTOR TIER</text>
+</g>
+<g class="subgraph" data-id="TIER5" data-label="5. ASYNCHRONOUS WORKER TIER (BullMQ Engine)">
+  <rect x="469.21400000000017" y="578" width="298.47299999999996" height="147.60000000000002" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="469.21400000000017" y="578" width="298.47299999999996" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="481.21400000000017" y="592" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">5. ASYNCHRONOUS WORKER TIER (BullMQ Engine)</text>
+</g>
+<g class="subgraph" data-id="TIER6" data-label="6. EXTERNAL CLOUD SERVICES">
+  <rect x="799.6870000000001" y="841.9" width="242.89799999999997" height="309.20000000000005" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="799.6870000000001" y="841.9" width="242.89799999999997" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="811.6870000000001" y="855.9" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">6. EXTERNAL CLOUD SERVICES</text>
+</g>
+<polyline class="edge" data-from="Web" data-to="Edge" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="HTTPS / JSON" points="315.111,608.9000000000001 331.111,608.9000000000001 346.87800000000016,608.9000000000001 346.87800000000016,805.9000000000001 193.43900000000008,805.9000000000001 193.43900000000008,944.3000000000002 255.60700000000008,944.3000000000001 271.6070000000001,944.3000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Mobile" data-to="Edge" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="HTTPS / JSON" points="306.219,682.7000000000002 331.111,682.7000000000002 439.21400000000017,682.7000000000002 439.21400000000017,817.9000000000001 245.60700000000008,817.9000000000001 245.60700000000008,915.1000000000001 255.60700000000008,915.1000000000001 271.6070000000001,915.1000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Edge" data-to="MW_Sec" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Forward Request" points="509.922,929.7 525.922,929.7 1885.9900000000002,929.7 1885.9900000000002,1304.4499999999998 1137.467,1304.4499999999998" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="MW_Val" data-to="Core_Services" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Dispatch Validated DTO" points="1821.9900000000002,1295.225 1837.9900000000002,1295.225 20,1286 20,114.9 1809.9900000000002,114.9 1809.9900000000002,686.625 16,686.625 16,273.825 28,273.825" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Core_Services" data-to="MW_Err" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Catch Exceptions" points="865.333,273.825 889.333,273.825 889.333,207.15000000000006 1081.467,207.15000000000003 1897.9900000000002,207.15000000000003 1897.9900000000002,1378.25 1137.467,1378.25" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Core_Services" data-to="BullProducer" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Enqueue Async Tasks" points="865.333,273.825 877.333,273.825 877.333,340.5 1081.467,340.5 8,340.5 8,1509.4875 1137.467,1509.4875" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="MW_Rate" data-to="Redis" data-style="solid" data-arrow-start="true" data-arrow-end="true" data-label="Check Limits" points="1440.538,1304.1916666666664 1452.538,1304.1916666666664 1452.538,1322.8999999999999 1837.9900000000002,1322.8999999999999 1909.9900000000002,1322.8999999999999 1909.9900000000002,131.4 421.36450000000025,131.4" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" marker-start="url(#arrowhead-start)" />
+<polyline class="edge" data-from="Svc_Auth" data-to="Redis" data-style="solid" data-arrow-start="true" data-arrow-end="true" data-label="Store / Revoke Tokens" points="459.62,1831.725 459.62,1847.725 -4,1847.725 -4,155.10000000000002 421.36450000000025,155.10000000000002" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" marker-start="url(#arrowhead-start)" />
+<polyline class="edge" data-from="Svc_Nutrition" data-to="Redis" data-style="solid" data-arrow-start="true" data-arrow-end="true" data-label="Cache-Aside (Sub-2ms)" points="750.1685,1831.725 750.1685,1847.725 1921.9900000000002,1847.725 1921.9900000000002,178.8 421.36450000000025,178.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" marker-start="url(#arrowhead-start)" />
+<polyline class="edge" data-from="Core_Services" data-to="MongoDB" data-style="solid" data-arrow-start="true" data-arrow-end="true" data-label="BSON Read / Write (Mongoose)" points="405.36450000000025,301.5 421.36450000000025,301.5" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" marker-start="url(#arrowhead-start)" />
+<polyline class="edge" data-from="BullProducer" data-to="Redis" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Push Jobs" points="1329.8400000000001,1509.4875 1345.8400000000001,1509.4875 -16,1511.6 -16,107.7 421.36450000000025,107.7" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Redis" data-to="Worker" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Poll Jobs" points="660.4205000000002,143.25 727.5495000000001,143.25 737.5495000000001,143.25 737.5495000000001,554 459.21400000000017,554 459.21400000000017,665.8 469.21400000000017,665.8 485.21400000000017,665.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Worker" data-to="Push" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Send Alerts" points="751.6870000000001,651.2 767.6870000000001,651.2 789.6870000000001,651.2 789.6870000000001,995.0500000000001 799.6870000000001,995.05 815.6870000000001,995.05" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Worker" data-to="MongoDB" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Nightly Rollups" points="751.6870000000001,680.4 767.6870000000001,680.4 777.6870000000001,680.4 777.6870000000001,566 395.36450000000025,566 395.36450000000025,262 405.36450000000025,262 421.36450000000025,262" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Svc_AI" data-to="VectorDB" data-style="solid" data-arrow-start="true" data-arrow-end="true" data-label="Top-K Semantic Search" points="158.74533333333335,1561.7375 158.74533333333335,1847.725 1933.9900000000002,1847.725 1933.9900000000002,403.35 421.36450000000025,403.35" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" marker-start="url(#arrowhead-start)" />
+<polyline class="edge" data-from="Svc_AI" data-to="LLM" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Grounded Prompt + Context" points="233.49066666666667,1561.7375 233.49066666666667,1847.725 -28,1847.725 -28,912.8 815.6870000000001,912.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="LLM" data-to="Svc_AI" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Structured JSON" points="1021.3980000000001,912.8 1042.585,912.8 1945.9900000000002,912.8 1945.9900000000002,1491.0375 196.118,1491.0375" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Core_Services" data-to="S3" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Generate Pre-Signed PUT URL" points="799.6870000000001,1106.8666666666668 815.6870000000001,1106.8666666666668" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="TIER1" data-to="S3" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Direct Binary Stream Upload (Bypasses API Thread)" points="167.5,725.6000000000001 167.5,829.9000000000001 535.922,829.9000000000001 535.922,1078.6333333333332 799.6870000000001,1078.6333333333332 815.6870000000001,1078.6333333333332" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="MW_Sec" data-to="MW_Rate" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1265.373,1295.2249999999997 1313.373,1295.2249999999997" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="MW_Rate" data-to="MW_Auth" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1440.538,1286.2583333333332 1452.538,1286.2583333333332 1452.538,1286 1488.538,1286" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="MW_Auth" data-to="MW_Val" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1643.861,1295.225 1691.861,1295.225" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="Web" data-to="Edge" data-label="HTTPS / JSON">
+  <rect x="302.37800000000016" y="768.6000000000001" width="88.336" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="346.54600000000016" y="783.7500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">HTTPS / JSON</text>
+</g>
+<g class="edge-label" data-from="Mobile" data-to="Edge" data-label="HTTPS / JSON">
+  <rect x="394.71400000000017" y="768.6000000000001" width="88.336" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="438.8820000000002" y="783.7500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">HTTPS / JSON</text>
+</g>
+<g class="edge-label" data-from="Edge" data-to="MW_Sec" data-label="Forward Request">
+  <rect x="1709.4845000000003" y="914.5500000000001" width="100.21600000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1759.5925000000002" y="929.7" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Forward Request</text>
+</g>
+<g class="edge-label" data-from="MW_Val" data-to="Core_Services" data-label="Dispatch Validated DTO">
+  <rect x="743.6405" y="99.75" width="128.13400000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="807.7075" y="114.9" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Dispatch Validated DTO</text>
+</g>
+<g class="edge-label" data-from="Core_Services" data-to="MW_Err" data-label="Catch Exceptions">
+  <rect x="1847.8820000000003" y="608.1455000000002" width="100.21600000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1897.9900000000002" y="623.2955000000002" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Catch Exceptions</text>
+</g>
+<g class="edge-label" data-from="Core_Services" data-to="BullProducer" data-label="Enqueue Async Tasks">
+  <rect x="-54.879000000000005" y="797.4955000000001" width="125.75800000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="8" y="812.6455000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Enqueue Async Tasks</text>
+</g>
+<g class="edge-label" data-from="MW_Rate" data-to="Redis" data-label="Check Limits">
+  <rect x="1871.1680000000001" y="207.1549166666667" width="77.644" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1909.9900000000002" y="222.3049166666667" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Check Limits</text>
+</g>
+<g class="edge-label" data-from="Svc_Auth" data-to="Redis" data-label="Store / Revoke Tokens">
+  <rect x="-66.879" y="1013.39025" width="125.75800000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="-4" y="1028.54025" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Store / Revoke Tokens</text>
+</g>
+<g class="edge-label" data-from="Svc_Nutrition" data-to="Redis" data-label="Cache-Aside (Sub-2ms)">
+  <rect x="1858.2200000000003" y="841.7105" width="127.54" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1921.9900000000002" y="856.8605" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Cache-Aside (Sub-2ms)</text>
+</g>
+<g class="edge-label" data-from="Core_Services" data-to="MongoDB" data-label="BSON Read / Write (Mongoose)">
+  <rect x="-4" y="-5" width="161.99200000000005" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="76.99600000000002" y="10.15" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">BSON Read / Write (Mongoose)</text>
+</g>
+<g class="edge-label" data-from="BullProducer" data-to="Redis" data-label="Push Jobs">
+  <rect x="-50.664" y="1264.73775" width="69.328" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="-16" y="1279.88775" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Push Jobs</text>
+</g>
+<g class="edge-label" data-from="Redis" data-to="Worker" data-label="Poll Jobs">
+  <rect x="706.0495000000001" y="504.70000000000005" width="62.2" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="737.1495000000001" y="519.85" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Poll Jobs</text>
+</g>
+<g class="edge-label" data-from="Worker" data-to="Push" data-label="Send Alerts">
+  <rect x="753.1870000000001" y="768.6" width="72.89200000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="789.6330000000002" y="783.75" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Send Alerts</text>
+</g>
+<g class="edge-label" data-from="Worker" data-to="MongoDB" data-label="Nightly Rollups">
+  <rect x="351.36450000000025" y="528.7" width="87.14800000000002" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="394.93850000000026" y="543.85" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Nightly Rollups</text>
+</g>
+<g class="edge-label" data-from="Svc_AI" data-to="VectorDB" data-label="Top-K Semantic Search">
+  <rect x="1869.6260000000002" y="1385.7470833333332" width="128.728" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1933.9900000000002" y="1400.8970833333333" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Top-K Semantic Search</text>
+</g>
+<g class="edge-label" data-from="Svc_AI" data-to="LLM" data-label="Grounded Prompt + Context">
+  <rect x="-100.68" y="1218.0643333333328" width="145.36" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="-28" y="1233.214333333333" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Grounded Prompt + Context</text>
+</g>
+<g class="edge-label" data-from="LLM" data-to="Svc_AI" data-label="Structured JSON">
+  <rect x="1771.8985000000002" y="1473.7749999999999" width="99.028" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1821.4125000000001" y="1488.925" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Structured JSON</text>
+</g>
+<g class="edge-label" data-from="Core_Services" data-to="S3" data-label="Generate Pre-Signed PUT URL">
+  <rect x="-4" y="-5" width="163.774" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="77.887" y="10.15" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Generate Pre-Signed PUT URL</text>
+</g>
+<g class="edge-label" data-from="TIER1" data-to="S3" data-label="Direct Binary Stream Upload (Bypasses API Thread)">
+  <rect x="36" y="768.6000000000001" width="262.37800000000004" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="167.18900000000002" y="783.7500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Direct Binary Stream Upload (Bypasses API Thread)</text>
+</g>
+<g class="node" data-id="Web" data-label="Web Client
+(React / Next.js)" data-shape="rectangle">
+  <rect x="183.5" y="582.0000000000001" width="131.611" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="249.3055" y="608.9000000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="249.3055" dy="-3.9000000000000012">Web Client</tspan><tspan x="249.3055" dy="16.900000000000002">(React / Next.js)</tspan></text>
+</g>
+<g class="node" data-id="Mobile" data-label="Mobile App
+(React Native)" data-shape="rectangle">
+  <rect x="183.5" y="655.8000000000002" width="122.71900000000001" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.8595" y="682.7000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.8595" dy="-3.9000000000000012">Mobile App</tspan><tspan x="244.8595" dy="16.900000000000002">(React Native)</tspan></text>
+</g>
+<g class="node" data-id="Edge" data-label="Nginx Reverse Proxy / Cloudflare
+• SSL/TLS 1.3 Termination
+• DDoS &amp; IP Whitelist
+• Gzip / Brotli Compression" data-shape="rectangle">
+  <rect x="271.6070000000001" y="885.9000000000001" width="238.31499999999997" height="87.60000000000001" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="390.76450000000006" y="929.7" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="390.76450000000006" dy="-20.8">Nginx Reverse Proxy / Cloudflare</tspan><tspan x="390.76450000000006" dy="16.900000000000002">• SSL/TLS 1.3 Termination</tspan><tspan x="390.76450000000006" dy="16.900000000000002">• DDoS &amp; IP Whitelist</tspan><tspan x="390.76450000000006" dy="16.900000000000002">• Gzip / Brotli Compression</tspan></text>
+</g>
+<g class="node" data-id="MW_Sec" data-label="Helmet &amp; CORS" data-shape="rectangle">
+  <rect x="1137.467" y="1286" width="127.90599999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1201.42" y="1304.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Helmet &amp; CORS</text>
+</g>
+<g class="node" data-id="MW_Rate" data-label="Rate Limiter
+(Redis Bucket)" data-shape="rectangle">
+  <rect x="1313.373" y="1268.3249999999998" width="127.165" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1376.9555" y="1295.225" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="1376.9555" dy="-3.9000000000000012">Rate Limiter</tspan><tspan x="1376.9555" dy="16.900000000000002">(Redis Bucket)</tspan></text>
+</g>
+<g class="node" data-id="MW_Auth" data-label="Auth &amp; RBAC Guard
+(JWT Bearer)" data-shape="rectangle">
+  <rect x="1488.538" y="1259.1" width="155.32299999999998" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1566.1995" y="1286" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="1566.1995" dy="-3.9000000000000012">Auth &amp; RBAC Guard</tspan><tspan x="1566.1995" dy="16.900000000000002">(JWT Bearer)</tspan></text>
+</g>
+<g class="node" data-id="MW_Val" data-label="Validation Pipe
+(Zod Schemas)" data-shape="rectangle">
+  <rect x="1691.861" y="1268.3249999999998" width="130.129" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1756.9255" y="1295.225" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="1756.9255" dy="-3.9000000000000012">Validation Pipe</tspan><tspan x="1756.9255" dy="16.900000000000002">(Zod Schemas)</tspan></text>
+</g>
+<g class="node" data-id="MW_Err" data-label="Central AppError
+Handler" data-shape="rectangle">
+  <rect x="1137.467" y="1351.35" width="144.949" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1209.9415000000001" y="1378.25" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="1209.9415000000001" dy="-3.9000000000000012">Central AppError</tspan><tspan x="1209.9415000000001" dy="16.900000000000002">Handler</tspan></text>
+</g>
+<g class="node" data-id="Svc_Auth" data-label="Auth Module
+• bcrypt Salt 12
+• Dual JWT (15m Access + 7d Refresh)" data-shape="rectangle">
+  <rect x="328.236" y="1761.025" width="262.76800000000003" height="70.7" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="459.62" y="1796.375" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="459.62" dy="-12.350000000000001">Auth Module</tspan><tspan x="459.62" dy="16.900000000000002">• bcrypt Salt 12</tspan><tspan x="459.62" dy="16.900000000000002">• Dual JWT (15m Access + 7d Refresh)</tspan></text>
+</g>
+<g class="node" data-id="Svc_User" data-label="User &amp; Profile Module
+• Mifflin-St Jeor BMR / TDEE
+• Indian Diet Preferences Profile" data-shape="rectangle">
+  <rect x="328.236" y="1491.0375" width="230.16399999999996" height="70.7" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="443.318" y="1526.3874999999998" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="443.318" dy="-12.350000000000001">User &amp; Profile Module</tspan><tspan x="443.318" dy="16.900000000000002">• Mifflin-St Jeor BMR / TDEE</tspan><tspan x="443.318" dy="16.900000000000002">• Indian Diet Preferences Profile</tspan></text>
+</g>
+<g class="node" data-id="Svc_Workout" data-label="Workout &amp; Tracking Module
+• Workout Plan Builder
+• 1RM Brzycki Volume Engine" data-shape="rectangle">
+  <rect x="328.236" y="1579.625" width="213.12099999999995" height="70.7" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="434.7965" y="1614.975" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="434.7965" dy="-12.350000000000001">Workout &amp; Tracking Module</tspan><tspan x="434.7965" dy="16.900000000000002">• Workout Plan Builder</tspan><tspan x="434.7965" dy="16.900000000000002">• 1RM Brzycki Volume Engine</tspan></text>
+</g>
+<g class="node" data-id="Svc_Nutrition" data-label="Nutrition Module
+• Indian Macro Catalog (Dal/Paneer/Roti)
+• Calorie &amp; Macro Target Engine" data-shape="rectangle">
+  <rect x="611.004" y="1761.025" width="278.32899999999995" height="70.7" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="750.1685" y="1796.375" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="750.1685" dy="-12.350000000000001">Nutrition Module</tspan><tspan x="750.1685" dy="16.900000000000002">• Indian Macro Catalog (Dal/Paneer/Roti)</tspan><tspan x="750.1685" dy="16.900000000000002">• Calorie &amp; Macro Target Engine</tspan></text>
+</g>
+<g class="node" data-id="Svc_Progress" data-label="Progress &amp; Analytics
+• Body Measurement Graphs
+• PR Badges &amp; Streak Engine" data-shape="rectangle">
+  <rect x="328.236" y="1670.325" width="213.12099999999998" height="70.7" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="434.7965" y="1705.675" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="434.7965" dy="-12.350000000000001">Progress &amp; Analytics</tspan><tspan x="434.7965" dy="16.900000000000002">• Body Measurement Graphs</tspan><tspan x="434.7965" dy="16.900000000000002">• PR Badges &amp; Streak Engine</tspan></text>
+</g>
+<g class="node" data-id="Svc_AI" data-label="AI &amp; RAG Orchestrator
+• Prompt Sanitizer &amp; Guardrails
+• Profile Context Builder" data-shape="rectangle">
+  <rect x="84" y="1491.0375" width="224.236" height="70.7" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="196.118" y="1526.3874999999998" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="196.118" dy="-12.350000000000001">AI &amp; RAG Orchestrator</tspan><tspan x="196.118" dy="16.900000000000002">• Prompt Sanitizer &amp; Guardrails</tspan><tspan x="196.118" dy="16.900000000000002">• Profile Context Builder</tspan></text>
+</g>
+<g class="node" data-id="BullProducer" data-label="BullMQ Queue Dispatcher" data-shape="rectangle">
+  <rect x="1137.467" y="1491.0375" width="192.373" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1233.6535000000001" y="1509.4875" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">BullMQ Queue Dispatcher</text>
+</g>
+<g class="node" data-id="Redis" data-label="Redis 7
+• Refresh Token Blacklist
+• Sliding-Window Rate Limits
+• Food Query Cache (TTL 24h)
+• Daily Macro Snapshot (TTL 15m)" data-shape="cylinder">
+  <rect x="421.36450000000025" y="91" width="239.05599999999995" height="104.50000000000001" fill="var(--_node-fill)" stroke="none" />
+  <line x1="421.36450000000025" y1="91" x2="421.36450000000025" y2="195.5" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="660.4205000000002" y1="91" x2="660.4205000000002" y2="195.5" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="540.8925000000003" cy="195.5" rx="119.52799999999998" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="540.8925000000003" cy="91" rx="119.52799999999998" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="540.8925000000003" y="143.25" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="540.8925000000003" dy="-29.250000000000004">Redis 7</tspan><tspan x="540.8925000000003" dy="16.900000000000002">• Refresh Token Blacklist</tspan><tspan x="540.8925000000003" dy="16.900000000000002">• Sliding-Window Rate Limits</tspan><tspan x="540.8925000000003" dy="16.900000000000002">• Food Query Cache (TTL 24h)</tspan><tspan x="540.8925000000003" dy="16.900000000000002">• Daily Macro Snapshot (TTL 15m)</tspan></text>
+</g>
+<g class="node" data-id="MongoDB" data-label="MongoDB Atlas (Replica Set)
+• users: { email: 1 }
+• workout_logs: { userId: 1, loggedDate: -1 }
+• foods: { name: 'text', regionalNames: 'text' }
+• progress: { userId: 1, recordedAt: -1 }" data-shape="cylinder">
+  <rect x="421.36450000000025" y="229.5" width="290.1849999999999" height="104.50000000000001" fill="var(--_node-fill)" stroke="none" />
+  <line x1="421.36450000000025" y1="229.5" x2="421.36450000000025" y2="334" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="711.5495000000001" y1="229.5" x2="711.5495000000001" y2="334" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="566.4570000000002" cy="334" rx="145.09249999999994" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="566.4570000000002" cy="229.5" rx="145.09249999999994" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="566.4570000000002" y="281.75" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="566.4570000000002" dy="-29.250000000000004">MongoDB Atlas (Replica Set)</tspan><tspan x="566.4570000000002" dy="16.900000000000002">• users: { email: 1 }</tspan><tspan x="566.4570000000002" dy="16.900000000000002">• workout_logs: { userId: 1, loggedDate: -1 }</tspan><tspan x="566.4570000000002" dy="16.900000000000002">• foods: { name: &#39;text&#39;, regionalNames: &#39;text&#39; }</tspan><tspan x="566.4570000000002" dy="16.900000000000002">• progress: { userId: 1, recordedAt: -1 }</tspan></text>
+</g>
+<g class="node" data-id="VectorDB" data-label="Vector DB (Atlas Vector / Pinecone)
+• Indian Food &amp; Macro Embeddings
+• Biomechanics &amp; Form Guides" data-shape="cylinder">
+  <rect x="421.36450000000025" y="368" width="247.94799999999995" height="70.7" fill="var(--_node-fill)" stroke="none" />
+  <line x1="421.36450000000025" y1="368" x2="421.36450000000025" y2="438.7" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="669.3125000000002" y1="368" x2="669.3125000000002" y2="438.7" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="545.3385000000002" cy="438.7" rx="123.97399999999998" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="545.3385000000002" cy="368" rx="123.97399999999998" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="545.3385000000002" y="403.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="545.3385000000002" dy="-12.350000000000001">Vector DB (Atlas Vector / Pinecone)</tspan><tspan x="545.3385000000002" dy="16.900000000000002">• Indian Food &amp; Macro Embeddings</tspan><tspan x="545.3385000000002" dy="16.900000000000002">• Biomechanics &amp; Form Guides</tspan></text>
+</g>
+<g class="node" data-id="Worker" data-label="BullMQ Worker Pool (Node.js)
+• Job 1: Workout &amp; Meal Reminders
+• Job 2: Nightly Volume &amp; Streak Rollup
+• Job 3: Transactional Email Queue" data-shape="rectangle">
+  <rect x="485.21400000000017" y="622" width="266.47299999999996" height="87.60000000000001" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="618.4505000000001" y="665.8" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="618.4505000000001" dy="-20.8">BullMQ Worker Pool (Node.js)</tspan><tspan x="618.4505000000001" dy="16.900000000000002">• Job 1: Workout &amp; Meal Reminders</tspan><tspan x="618.4505000000001" dy="16.900000000000002">• Job 2: Nightly Volume &amp; Streak Rollup</tspan><tspan x="618.4505000000001" dy="16.900000000000002">• Job 3: Transactional Email Queue</tspan></text>
+</g>
+<g class="node" data-id="S3" data-label="AWS S3 Bucket
+• Progress Photos
+• Exercise Videos" data-shape="cylinder">
+  <rect x="815.6870000000001" y="1057.4" width="153.1" height="70.7" fill="var(--_node-fill)" stroke="none" />
+  <line x1="815.6870000000001" y1="1057.4" x2="815.6870000000001" y2="1128.1000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="968.7870000000001" y1="1057.4" x2="968.7870000000001" y2="1128.1000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="892.2370000000001" cy="1128.1000000000001" rx="76.55" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="892.2370000000001" cy="1057.4" rx="76.55" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="892.2370000000001" y="1092.75" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="892.2370000000001" dy="-12.350000000000001">AWS S3 Bucket</tspan><tspan x="892.2370000000001" dy="16.900000000000002">• Progress Photos</tspan><tspan x="892.2370000000001" dy="16.900000000000002">• Exercise Videos</tspan></text>
+</g>
+<g class="node" data-id="LLM" data-label="LLM API (OpenAI / Gemini)
+• Grounded Nutrition Advice" data-shape="rectangle">
+  <rect x="815.6870000000001" y="885.9" width="205.71099999999998" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="918.5425000000001" y="912.8" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="918.5425000000001" dy="-3.9000000000000012">LLM API (OpenAI / Gemini)</tspan><tspan x="918.5425000000001" dy="16.900000000000002">• Grounded Nutrition Advice</tspan></text>
+</g>
+<g class="node" data-id="Push" data-label="Notification Gateway
+• Firebase Cloud Messaging
+• Resend / SendGrid (Email)" data-shape="rectangle">
+  <rect x="815.6870000000001" y="959.7" width="210.89799999999997" height="70.7" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="921.1360000000001" y="995.0500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="921.1360000000001" dy="-12.350000000000001">Notification Gateway</tspan><tspan x="921.1360000000001" dy="16.900000000000002">• Firebase Cloud Messaging</tspan><tspan x="921.1360000000001" dy="16.900000000000002">• Resend / SendGrid (Email)</tspan></text>
+</g>
+</svg>
