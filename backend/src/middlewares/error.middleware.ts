@@ -1,5 +1,5 @@
-
 import { Request, Response, NextFunction } from "express";
+import AppError from "../utils/AppError.js";
 
 const errorMiddleware = (
   err: any,
@@ -8,6 +8,14 @@ const errorMiddleware = (
   next: NextFunction
 ) => {
   console.error(err);
+
+  if (err instanceof AppError) {
+    res.status(err.statusCode).json({
+      success: false,
+      message: err.message
+    });
+    return;
+  }
 
   if (err.name === "ValidationError") {
     res.status(400).json({
@@ -27,4 +35,3 @@ const errorMiddleware = (
 };
 
 export default errorMiddleware;
-

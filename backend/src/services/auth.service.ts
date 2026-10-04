@@ -1,15 +1,16 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import AppError from "../utils/AppError.js";
 
 export const registerUserService = async (data: any) => {
   const existingUser = await User.findOne({
     email: data.email
   });
 
-  if (existingUser) {
-    throw new Error("Email already registered");
-  }
+ if (existingUser) {
+  throw new AppError("Email already registered", 409);
+}
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
@@ -37,7 +38,7 @@ export const loginUserService = async (
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
-    throw new Error("Invalid email or password");
+    throw new AppError("Invalid email or password", 401);
   }
 
   const isPasswordCorrect = await bcrypt.compare(
@@ -46,7 +47,7 @@ export const loginUserService = async (
   );
 
   if (!isPasswordCorrect) {
-    throw new Error("Invalid email or password");
+    throw new AppError("Invalid email or password", 401);
   }
 
 
