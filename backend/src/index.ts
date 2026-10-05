@@ -9,6 +9,10 @@ import workoutRoutes from "./routes/workout.routes.js";
 import authRotes from "./routes/auth.routes.js";
 
 import connectDB from "./config/database.js";
+import workoutPlanRoutes from "./routes/workoutPlan.routes.js";
+
+import exerciseRoutes from "./routes/exercise.routes.js";
+
 
 const app = express();
 
@@ -17,6 +21,8 @@ connectDB();
 app.use(LoggerMiddleware);
 app.use(express.json());
 app.use("/api/v1/auth",authRotes);
+app.use("/api/v1/workout-plans", workoutPlanRoutes);
+app.use("/api/v1/exercises", exerciseRoutes);
 
 
 app.get("/", (req, res) => {
