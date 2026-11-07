@@ -1,0 +1,19 @@
+{
+  "name": "fitforge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint \"services/*/src/**/*.ts\" && npm run lint --prefix frontend",
+    "format": "prettier --write \"README.md\" \"docker-compose.yml\" \"package.json\" \"eslint.config.js\" \"services/*/src/**/*.ts\" \"services/*/*.json\" \"services/*/*.yaml\" \"services/*/*.md\" \"frontend/src/**/*.{ts,tsx,css}\" \"frontend/*.{json,ts,html}\" \"docs/**/*.md\" \".github/workflows/*.yml\"",
+    "format:check": "prettier --check \"README.md\" \"docker-compose.yml\" \"package.json\" \"eslint.config.js\" \"services/*/src/**/*.ts\" \"services/*/*.json\" \"services/*/*.yaml\" \"services/*/*.md\" \"frontend/src/**/*.{ts,tsx,css}\" \"frontend/*.{json,ts,html}\" \"docs/**/*.md\" \".github/workflows/*.yml\"",
+    "build": "npm run build --prefix services/auth-service && npm run build --prefix services/api-gateway && npm run build --prefix services/workout-service && npm run build --prefix services/nutrition-service && npm run build --prefix services/progress-service && npm run build --prefix services/profile-service && npm run build --prefix services/personalization-service && npm run build --prefix frontend",
+    "test": "npm test --prefix services/auth-service && npm test --prefix services/api-gateway && npm test --prefix services/workout-service && npm test --prefix services/nutrition-service && npm test --prefix services/progress-service && npm test --prefix services/profile-service && npm test --prefix services/personalization-service"
+  },
+  "devDependencies": {
+    "eslint": "^10.0.0",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.0"
+  }
+}

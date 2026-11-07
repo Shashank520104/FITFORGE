@@ -1,0 +1,21 @@
+flowchart TB
+    Browser[Browser or API client]
+    subgraph Compose["Current Docker Compose deployment"]
+        Gateway["api-gateway<br/>Express :3000"]
+        Auth["auth-service<br/>Express :3002"]
+        Workout["workout-service<br/>Express :3001"]
+        Nutrition["nutrition-service<br/>Express :3004"]
+        Postgres[(PostgreSQL 17<br/>separate Auth and Nutrition databases/roles)]
+        Mongo[(MongoDB 8<br/>Workout-owned)]
+        AuthMigration["auth-migrate<br/>one-shot migration"]
+        NutritionMigration["nutrition-migrate<br/>one-shot migration"]
+    end
+    Browser -->|Published loopback port| Gateway
+    Gateway -->|HTTP, request ID, optional bearer| Auth
+    Gateway -->|HTTP, request ID, bearer| Workout
+    Gateway -->|HTTP, request ID, bearer| Nutrition
+    Auth --> Postgres
+    Workout --> Mongo
+    Nutrition --> Postgres
+    AuthMigration --> Postgres
+    NutritionMigration --> Postgres

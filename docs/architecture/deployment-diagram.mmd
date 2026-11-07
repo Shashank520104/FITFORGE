@@ -1,0 +1,21 @@
+flowchart LR
+    Host[Developer workstation]
+    subgraph Docker["Docker Compose network"]
+        Gateway["Gateway<br/>127.0.0.1:3000"]
+        Auth["Auth container<br/>port 3002 internal"]
+        Workout["Workout container<br/>port 3001 internal"]
+        Nutrition["Nutrition container<br/>port 3004 internal"]
+        Pg[(PostgreSQL volume<br/>separate Auth/Nutrition DBs)]
+        Mongo[(MongoDB volume)]
+        Migrations["Auth and Nutrition migrations"]
+    end
+    Host --> Gateway
+    Host -. "127.0.0.1 ports for local integration tests" .-> Pg
+    Host -.-> Mongo
+    Gateway --> Auth
+    Gateway --> Workout
+    Gateway --> Nutrition
+    Auth --> Pg
+    Nutrition --> Pg
+    Migrations --> Pg
+    Workout --> Mongo

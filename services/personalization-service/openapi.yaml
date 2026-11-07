@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: FITFORGE Personalization Service
+  version: 1.0.0
+  description: >
+    Private, owner-scoped wellness preferences, encrypted medical report
+    storage, non-diagnostic document summaries, and general AI-generated
+    seven-day meal and workout ideas.
+servers:
+  - url: http://localhost:3000
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/wellness/profile:
+    get:
+      summary: Get the authenticated user's wellness preferences
+      responses:
+        "200": { description: Preferences or null when not yet set. }
+        "401": { description: Missing or invalid access token. }
+    put:
+      summary: Save height, weight, diet, experience, and exercise confirmation
+      description: >
+        exerciseCleared is an explicit user confirmation that a qualified
+        clinician has cleared exercise. It is not evaluated or verified by AI.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                [
+                  heightCm,
+                  weightKg,
+                  dietPreference,
+                  experienceLevel,
+                  exerciseCleared,
+                ]
+              properties:
+                heightCm: { type: number, minimum: 100, maximum: 250 }
+                weightKg: { type: number, minimum: 30, maximum: 350 }
+                dietPreference:
+                  type: string
+                  enum: [vegetarian, non_vegetarian, vegan]
+                experienceLevel:
+                  type: string
+                  enum: [beginner, intermediate, advanced]
+                exerciseCleared: { type: boolean }
+      responses:
+        "200": { description: Saved preferences. }
+        "400": { description: Invalid preferences. }
+  /api/v1/wellness/reports:
+    get:
+      summary: List the current user's uploaded report metadata
+      responses:
+        "200": { description: Private report metadata. }
+    post:
+      summary: Upload and encrypt a medical report
+      description: >
+        Supports PDF, JPEG, or PNG files up to 8 MB. File bytes are encrypted
+        before database storage. Uploading a report clears exercise confirmation.
+      parameters:
+        - in: header
+          name: X-File-Name
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/pdf: { schema: { type: string, format: binary } }
+          image/jpeg: { schema: { type: string, format: binary } }
+          image/png: { schema: { type: string, format: binary } }
+      responses:
+        "201": { description: Stored report metadata. }
+        "400": { description: Empty, mismatched, or invalid file. }
+        "401": { description: Missing or invalid access token. }
+        "413": { description: Report exceeds 8 MB. }
+        "415": { description: Unsupported report type. }
+  /api/v1/wellness/reports/{reportId}/summary:
+    post:
+      summary: Create a non-diagnostic summary of an uploaded report
+      description: >
+        Extracts text locally and sends it to the configured local Ollama
+        model only when explicitly requested. Summary is not persisted.
+      parameters:
+        - in: path
+          name: reportId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200": { description: Plain-language summary and clinician warning. }
+        "404": { description: Report not found. }
+        "422": { description: No readable report text. }
+        "503": { description: Local model unavailable. }
+  /api/v1/wellness/reports/{reportId}:
+    delete:
+      summary: Permanently delete the current user's encrypted report
+      parameters:
+        - in: path
+          name: reportId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200": { description: Report deleted. }
+        "404": { description: Report not found. }
+  /api/v1/wellness/plan:
+    get:
+      summary: Get the saved personalized seven-day ideas
+      responses:
+        "200": { description: Saved meal and optional workout ideas. }
+  /api/v1/wellness/plan/generate:
+    post:
+      summary: Generate personalized seven-day wellness ideas
+      description: >
+        Uses height, weight, experience, and diet preference for general
+        lifestyle ideas. Without explicit exercise clearance, only meal ideas
+        are generated and returned. Not medical advice or a treatment diet.
+      responses:
+        "200":
+          { description: Seven-day meal ideas and, if cleared, workout ideas. }
+        "409": { description: Wellness preferences must be saved first. }
+        "502": { description: Model returned an invalid plan. }
+        "503": { description: Local model unavailable. }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

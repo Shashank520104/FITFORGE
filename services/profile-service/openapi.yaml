@@ -1,0 +1,90 @@
+openapi: 3.1.0
+info:
+  title: FITFORGE Profile Service
+  version: 1.0.0
+  description: Private owner-scoped user profile and preference management.
+servers:
+  - url: http://localhost:3000
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/profile:
+    get:
+      summary: Get or initialize the authenticated user's profile
+      responses:
+        "200": { description: Profile with safe default preferences. }
+        "401": { description: Missing or invalid access token. }
+    patch:
+      summary: Update selected profile preferences
+      description: >
+        Only submitted fields are updated. Set displayName or trainingGoal to
+        null to clear it. Dietary and equipment values are labels, not verified
+        allergy, health, or equipment-safety determinations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              minProperties: 1
+              properties:
+                displayName:
+                  anyOf:
+                    - type: string
+                      minLength: 1
+                      maxLength: 80
+                    - type: "null"
+                units:
+                  type: string
+                  enum: [metric, imperial]
+                trainingGoal:
+                  anyOf:
+                    - type: string
+                      enum:
+                        [
+                          muscle_gain,
+                          fat_loss,
+                          powerlifting,
+                          athletic_performance,
+                          general_fitness,
+                        ]
+                    - type: "null"
+                experienceLevel:
+                  anyOf:
+                    - type: string
+                      enum: [beginner, intermediate, advanced]
+                    - type: "null"
+                equipment:
+                  type: array
+                  maxItems: 5
+                  uniqueItems: true
+                  items:
+                    type: string
+                    enum: [bodyweight, dumbbell, barbell, machine, band]
+                dietaryPreferences:
+                  type: array
+                  maxItems: 7
+                  uniqueItems: true
+                  items:
+                    type: string
+                    enum:
+                      [
+                        vegetarian,
+                        vegan,
+                        pescatarian,
+                        halal,
+                        kosher,
+                        gluten_free,
+                        dairy_free,
+                      ]
+      responses:
+        "200": { description: Updated profile. }
+        "400": { description: Invalid or empty profile update. }
+        "401": { description: Missing or invalid access token. }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

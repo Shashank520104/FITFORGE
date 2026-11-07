@@ -1,0 +1,372 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    environment:
+      OLLAMA_MAX_LOADED_MODELS: 1
+      OLLAMA_NUM_PARALLEL: 1
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  ollama-model-init:
+    image: ollama/ollama:latest
+    command: ["pull", "${OLLAMA_MODEL:-qwen2.5:3b}"]
+    restart: "no"
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    volumes:
+      - ollama_data:/root/.ollama
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mongodb:
+    image: mongo:8.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test:
+        ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      AUTH_DATABASE_PASSWORD: ${AUTH_DATABASE_PASSWORD:?Set AUTH_DATABASE_PASSWORD in .env}
+      NUTRITION_DATABASE_NAME: ${NUTRITION_DATABASE_NAME:-fitforge_nutrition}
+      NUTRITION_DATABASE_PASSWORD: ${NUTRITION_DATABASE_PASSWORD:?Set NUTRITION_DATABASE_PASSWORD in .env}
+      PROGRESS_DATABASE_NAME: ${PROGRESS_DATABASE_NAME:-fitforge_progress}
+      PROGRESS_DATABASE_PASSWORD: ${PROGRESS_DATABASE_PASSWORD:?Set PROGRESS_DATABASE_PASSWORD in .env}
+      PROFILE_DATABASE_NAME: ${PROFILE_DATABASE_NAME:-fitforge_profile}
+      PROFILE_DATABASE_PASSWORD: ${PROFILE_DATABASE_PASSWORD:?Set PROFILE_DATABASE_PASSWORD in .env}
+      PERSONALIZATION_DATABASE_NAME: ${PERSONALIZATION_DATABASE_NAME:-fitforge_personalization}
+      PERSONALIZATION_DATABASE_PASSWORD: ${PERSONALIZATION_DATABASE_PASSWORD:?Set PERSONALIZATION_DATABASE_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  auth-migrate:
+    build:
+      context: ./services/auth-service
+    command: ["node", "dist/migrate.js"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://auth_owner:${AUTH_DATABASE_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    restart: unless-stopped
+    environment:
+      PORT: 3002
+      DATABASE_URL: postgres://auth_owner:${AUTH_DATABASE_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
+      REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    depends_on:
+      auth-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3002/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  workout-service:
+    build:
+      context: ./services/workout-service
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      MONGODB_URI: mongodb://mongodb:27017/fitforge_workout
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  workout-jobs-worker:
+    build:
+      context: ./services/workout-service
+    command: ["node", "dist/worker.js"]
+    restart: unless-stopped
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/fitforge_workout
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nutrition-migrate:
+    build:
+      context: ./services/nutrition-service
+    command: ["node", "dist/migrate.js"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://nutrition_owner:${NUTRITION_DATABASE_PASSWORD}@postgres:5432/${NUTRITION_DATABASE_NAME:-fitforge_nutrition}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  nutrition-service:
+    build:
+      context: ./services/nutrition-service
+    restart: unless-stopped
+    environment:
+      PORT: 3004
+      DATABASE_URL: postgres://nutrition_owner:${NUTRITION_DATABASE_PASSWORD}@postgres:5432/${NUTRITION_DATABASE_NAME:-fitforge_nutrition}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+    depends_on:
+      nutrition-migrate:
+        condition: service_completed_successfully
+      ollama-model-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3004/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  progress-migrate:
+    build:
+      context: ./services/progress-service
+    command: ["node", "dist/migrate.js"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://progress_owner:${PROGRESS_DATABASE_PASSWORD}@postgres:5432/${PROGRESS_DATABASE_NAME:-fitforge_progress}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  progress-service:
+    build:
+      context: ./services/progress-service
+    restart: unless-stopped
+    environment:
+      PORT: 3005
+      DATABASE_URL: postgres://progress_owner:${PROGRESS_DATABASE_PASSWORD}@postgres:5432/${PROGRESS_DATABASE_NAME:-fitforge_progress}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    depends_on:
+      progress-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3005/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  profile-migrate:
+    build:
+      context: ./services/profile-service
+    command: ["node", "dist/migrate.js"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://profile_owner:${PROFILE_DATABASE_PASSWORD}@postgres:5432/${PROFILE_DATABASE_NAME:-fitforge_profile}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  profile-service:
+    build:
+      context: ./services/profile-service
+    restart: unless-stopped
+    environment:
+      PORT: 3006
+      DATABASE_URL: postgres://profile_owner:${PROFILE_DATABASE_PASSWORD}@postgres:5432/${PROFILE_DATABASE_NAME:-fitforge_profile}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+    depends_on:
+      profile-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3006/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  personalization-migrate:
+    build:
+      context: ./services/personalization-service
+    command: ["node", "dist/migrate.js"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://personalization_owner:${PERSONALIZATION_DATABASE_PASSWORD}@postgres:5432/${PERSONALIZATION_DATABASE_NAME:-fitforge_personalization}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      REPORT_ENCRYPTION_KEY: ${REPORT_ENCRYPTION_KEY:?Set REPORT_ENCRYPTION_KEY in .env}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  personalization-service:
+    build:
+      context: ./services/personalization-service
+    restart: unless-stopped
+    environment:
+      PORT: 3007
+      DATABASE_URL: postgres://personalization_owner:${PERSONALIZATION_DATABASE_PASSWORD}@postgres:5432/${PERSONALIZATION_DATABASE_NAME:-fitforge_personalization}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      REPORT_ENCRYPTION_KEY: ${REPORT_ENCRYPTION_KEY:?Set REPORT_ENCRYPTION_KEY in .env}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
+    depends_on:
+      personalization-migrate:
+        condition: service_completed_successfully
+      ollama-model-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3007/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      AUTH_SERVICE_URL: http://auth-service:3002
+      WORKOUT_SERVICE_URL: http://workout-service:3001
+      NUTRITION_SERVICE_URL: http://nutrition-service:3004
+      PROGRESS_SERVICE_URL: http://progress-service:3005
+      PROFILE_SERVICE_URL: http://profile-service:3006
+      PERSONALIZATION_SERVICE_URL: http://personalization-service:3007
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      UPSTREAM_TIMEOUT_MS: ${UPSTREAM_TIMEOUT_MS:-5000}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-120}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      workout-service:
+        condition: service_healthy
+      nutrition-service:
+        condition: service_healthy
+      progress-service:
+        condition: service_healthy
+      profile-service:
+        condition: service_healthy
+      personalization-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+
+volumes:
+  mongodb_data:
+  ollama_data:
+  postgres_data:
+  redis_data:

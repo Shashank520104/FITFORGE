@@ -1,0 +1,317 @@
+openapi: 3.1.0
+info:
+  title: FITFORGE Workout Service
+  version: 1.0.0
+  description: Exercise discovery, owner-scoped workout plans, and workout sessions.
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/v1/exercises:
+    get:
+      summary: List and filter exercises
+      parameters:
+        - in: query
+          name: muscle
+          schema: { type: string, maxLength: 50 }
+        - in: query
+          name: difficulty
+          schema: { type: string, enum: [beginner, intermediate, advanced] }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, maximum: 1000000, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        "200": { description: Filtered exercise page. }
+        "400": { description: Invalid query parameters. }
+  /api/v1/exercises/{id}:
+    get:
+      summary: Read an exercise
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, pattern: "^[0-9a-fA-F]{24}$" }
+      responses:
+        "200": { description: Exercise details. }
+        "400": { description: Invalid MongoDB ObjectId. }
+        "404": { description: Exercise not found. }
+  /api/v1/workout-plans:
+    get:
+      security:
+        - bearerAuth: []
+      summary: List the authenticated user's workout plans
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, maximum: 1000000, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        "200": { description: Owner-scoped plan page. }
+        "401": { description: Missing or invalid access token. }
+    post:
+      security:
+        - bearerAuth: []
+      summary: Create a workout plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkoutPlanInput"
+      responses:
+        "201": { description: Plan created. }
+        "400": { description: Invalid plan. }
+        "401": { description: Missing or invalid access token. }
+        "422": { description: A referenced exercise does not exist. }
+  /api/v1/workout-plans/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, pattern: "^[0-9a-fA-F]{24}$" }
+    get:
+      security:
+        - bearerAuth: []
+      summary: Read an owned workout plan
+      responses:
+        "200": { description: Plan with exercise details. }
+        "401": { description: Missing or invalid access token. }
+        "404": { description: Plan not found or not owned by the caller. }
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Update an owned workout plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkoutPlanPatch"
+      responses:
+        "200": { description: Updated plan. }
+        "400": { description: Invalid update. }
+        "401": { description: Missing or invalid access token. }
+        "404": { description: Plan not found or not owned by the caller. }
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Delete an owned workout plan
+      responses:
+        "204": { description: Plan deleted. }
+        "401": { description: Missing or invalid access token. }
+        "404": { description: Plan not found or not owned by the caller. }
+  /api/v1/workout-sessions:
+    get:
+      security:
+        - bearerAuth: []
+      summary: List the authenticated user's workout sessions
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, maximum: 1000000, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        "200":
+          { description: Owner-scoped session page and current active session. }
+        "400": { description: Invalid pagination. }
+        "401": { description: Missing or invalid access token. }
+    post:
+      security:
+        - bearerAuth: []
+      summary: Start a workout session from an owned plan day
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [planId, day]
+              properties:
+                planId: { type: string, pattern: "^[0-9a-fA-F]{24}$" }
+                day: { type: integer, minimum: 1, maximum: 7 }
+      responses:
+        "201": { description: Session started with a snapshot of its plan day. }
+        "400": { description: Invalid session request. }
+        "401": { description: Missing or invalid access token. }
+        "404": { description: Plan or workout day not found. }
+        "409": { description: User already has an active session. }
+  /api/v1/workout-sessions/insights:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Compare logged exercise volume across completed sessions
+      description: >
+        Returns owner-scoped comparisons for each exercise with completed sets
+        in the 100 most recent completed sessions. Volume is the sum of
+        repetitions multiplied by logged load; this is descriptive history,
+        not training or medical advice.
+      responses:
+        "200":
+          {
+            description: Owner-scoped exercise trends and session count analyzed.,
+          }
+        "401": { description: Missing or invalid access token. }
+  /api/v1/workout-sessions/insights/jobs/{jobId}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Read the status of an owner-scoped insight refresh job
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema: { type: string, maxLength: 128 }
+      responses:
+        "200": { description: Job state and result when complete. }
+        "401": { description: Missing or invalid access token. }
+        "404": { description: Job not found or not owned by the caller. }
+        "503": { description: Background jobs are unavailable. }
+  /api/v1/workout-sessions/{id}/sets:
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Record actual reps and load for a planned set
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, pattern: "^[0-9a-fA-F]{24}$" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [exerciseIndex, setIndex, reps, weight]
+              properties:
+                exerciseIndex: { type: integer, minimum: 0, maximum: 83 }
+                setIndex: { type: integer, minimum: 0, maximum: 9 }
+                reps: { type: integer, minimum: 1, maximum: 100 }
+                weight: { type: number, minimum: 0, maximum: 500 }
+      responses:
+        "200": { description: Updated session. }
+        "400": { description: Invalid request or set index. }
+        "401": { description: Missing or invalid access token. }
+        "404": { description: Session not found or not owned by the caller. }
+        "409":
+          { description: Session is not active or set was already recorded. }
+  /api/v1/workout-sessions/{id}/finish:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Finish a session and queue a descriptive insights refresh
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, pattern: "^[0-9a-fA-F]{24}$" }
+      responses:
+        "200":
+          {
+            description: "Session marked completed; analytics includes job status.",
+          }
+        "401": { description: Missing or invalid access token. }
+        "404": { description: Session not found or not owned by the caller. }
+        "409": { description: Session is not active. }
+  /api/v1/workout-sessions/{id}/abandon:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Abandon an active workout session
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, pattern: "^[0-9a-fA-F]{24}$" }
+      responses:
+        "200":
+          {
+            description: Session marked abandoned; recorded sets are preserved.,
+          }
+        "401": { description: Missing or invalid access token. }
+        "404": { description: Session not found or not owned by the caller. }
+        "409": { description: Session is not active. }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    WorkoutPlanInput:
+      type: object
+      additionalProperties: false
+      required: [name, goal, days]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        goal:
+          type: string
+          enum:
+            [
+              muscle_gain,
+              fat_loss,
+              powerlifting,
+              athletic_performance,
+              general_fitness,
+            ]
+        days:
+          type: array
+          minItems: 1
+          maxItems: 7
+          items:
+            type: object
+            additionalProperties: false
+            required: [day, name, exercises]
+            properties:
+              day: { type: integer, minimum: 1, maximum: 7 }
+              name: { type: string, minLength: 1, maxLength: 60 }
+              exercises:
+                type: array
+                minItems: 1
+                maxItems: 12
+                items:
+                  type: object
+                  additionalProperties: false
+                  required: [exerciseId, sets]
+                  properties:
+                    exerciseId: { type: string, pattern: "^[0-9a-fA-F]{24}$" }
+                    sets:
+                      type: array
+                      minItems: 1
+                      maxItems: 10
+                      items:
+                        type: object
+                        additionalProperties: false
+                        required: [reps, restSeconds]
+                        properties:
+                          reps: { type: integer, minimum: 1, maximum: 100 }
+                          weight:
+                            { type: [number, "null"], minimum: 0, maximum: 500 }
+                          restSeconds:
+                            { type: integer, minimum: 0, maximum: 3600 }
+    WorkoutPlanPatch:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        goal:
+          type: string
+          enum:
+            [
+              muscle_gain,
+              fat_loss,
+              powerlifting,
+              athletic_performance,
+              general_fitness,
+            ]
+        days:
+          $ref: "#/components/schemas/WorkoutPlanInput/properties/days"

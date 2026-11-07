@@ -1,0 +1,21 @@
+erDiagram
+    USERS ||--o{ REFRESH_SESSIONS : owns
+    USERS {
+        uuid id PK
+        text email UK
+        text password_hash
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    REFRESH_SESSIONS {
+        uuid id PK
+        uuid user_id FK
+        text token_hash UK
+        timestamptz expires_at
+        timestamptz revoked_at
+        timestamptz created_at
+    }
+    SCHEMA_MIGRATIONS {
+        text version PK
+        timestamptz applied_at
+    }

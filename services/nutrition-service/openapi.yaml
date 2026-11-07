@@ -1,0 +1,395 @@
+openapi: 3.1.0
+info:
+  title: FITFORGE Nutrition Service
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/foods:
+    get:
+      summary: List the authenticated user's foods
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Owner-scoped food list
+    post:
+      summary: Add a user-sourced food record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FoodInput"
+      responses:
+        "201":
+          description: Food created
+        "400":
+          description: Invalid food data
+  /api/v1/foods/estimate:
+    get:
+      summary: Check whether the local food estimate model is available
+      responses:
+        "200":
+          description: Food estimate availability
+    post:
+      summary: Estimate food nutrients with local Ollama
+      description: Returns a labeled local-model estimate per 100 g/ml; review it before saving.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name, servingUnit]
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                servingUnit:
+                  type: string
+                  enum: [g, ml]
+      responses:
+        "200":
+          description: AI-generated nutrient estimate
+        "400":
+          description: Invalid food description
+        "503":
+          description: Local model is missing or unavailable
+  /api/v1/coach/chat:
+    post:
+      summary: Ask the local AI fitness coach
+      description: General fitness and healthy-habit education. Not medical advice. Conversation history is supplied by the caller and is not stored.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [question]
+              properties:
+                question:
+                  type: string
+                  minLength: 1
+                  maxLength: 1000
+                history:
+                  type: array
+                  maxItems: 8
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required: [role, content]
+                    properties:
+                      role:
+                        type: string
+                        enum: [user, assistant]
+                      content:
+                        type: string
+                        minLength: 1
+                        maxLength: 1000
+      responses:
+        "200":
+          description: Coach answer from the configured local model
+        "400":
+          description: Invalid question or conversation history
+        "503":
+          description: Local model is missing
+        "504":
+          description: Local model timed out
+  /api/v1/coach/stream:
+    post:
+      summary: Stream a local AI fitness coach answer
+      description: Streams general fitness and healthy-habit education as server-sent events. Not medical advice. Conversation history is supplied by the caller and is not stored.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [question]
+              properties:
+                question:
+                  type: string
+                  minLength: 1
+                  maxLength: 1000
+                history:
+                  type: array
+                  maxItems: 8
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required: [role, content]
+                    properties:
+                      role:
+                        type: string
+                        enum: [user, assistant]
+                      content:
+                        type: string
+                        minLength: 1
+                        maxLength: 1000
+      responses:
+        "200":
+          description: Coach answer streamed as token, done, or error events.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "400":
+          description: Invalid question or conversation history
+        "503":
+          description: Local model is missing
+        "504":
+          description: Local model timed out
+  /api/v1/foods/{id}:
+    patch:
+      summary: Update an owned food record
+      parameters:
+        - $ref: "#/components/parameters/FoodId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FoodPatch"
+      responses:
+        "200":
+          description: Food updated
+        "404":
+          description: Food not found
+    delete:
+      summary: Delete an owned food record
+      parameters:
+        - $ref: "#/components/parameters/FoodId"
+      responses:
+        "204":
+          description: Food deleted
+        "404":
+          description: Food not found
+  /api/v1/nutrition/logs:
+    get:
+      summary: Read meals and nutrient totals for one date
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Owner-scoped meal logs and calculated daily totals
+    post:
+      summary: Log a meal using owned food records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [date, mealType, items]
+              properties:
+                date:
+                  type: string
+                  format: date
+                mealType:
+                  type: string
+                  enum: [breakfast, lunch, dinner, snack]
+                items:
+                  type: array
+                  minItems: 1
+                  maxItems: 50
+                  items:
+                    type: object
+                    required: [foodId, servingAmount]
+                    properties:
+                      foodId:
+                        type: string
+                        format: uuid
+                      servingAmount:
+                        type: number
+                        minimum: 0.1
+                        maximum: 10000
+      responses:
+        "201":
+          description: Meal log stored with immutable nutrient snapshots
+        "422":
+          description: One or more foods are unavailable to this account
+  /api/v1/nutrition/logs/{id}:
+    delete:
+      summary: Delete an owned meal log
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Meal log deleted
+        "404":
+          description: Meal log not found
+components:
+  parameters:
+    FoodId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    FoodInput:
+      type: object
+      required:
+        - name
+        - servingUnit
+        - caloriesPer100
+        - proteinPer100
+        - carbohydratesPer100
+        - fatPer100
+        - fiberPer100
+        - sodiumMgPer100
+        - sourceLabel
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        brand:
+          type: string
+          maxLength: 120
+        servingUnit:
+          type: string
+          enum: [g, ml]
+        caloriesPer100:
+          type: number
+          minimum: 0
+          maximum: 1000
+        proteinPer100:
+          type: number
+          minimum: 0
+          maximum: 100
+        carbohydratesPer100:
+          type: number
+          minimum: 0
+          maximum: 100
+        fatPer100:
+          type: number
+          minimum: 0
+          maximum: 100
+        fiberPer100:
+          type: number
+          minimum: 0
+          maximum: 100
+        sodiumMgPer100:
+          type: number
+          minimum: 0
+          maximum: 100000
+        calciumMgPer100:
+          type: number
+          minimum: 0
+          maximum: 100000
+        ironMgPer100:
+          type: number
+          minimum: 0
+          maximum: 10000
+        potassiumMgPer100:
+          type: number
+          minimum: 0
+          maximum: 100000
+        magnesiumMgPer100:
+          type: number
+          minimum: 0
+          maximum: 100000
+        sourceLabel:
+          type: string
+          maxLength: 200
+        sourceUrl:
+          type: string
+          format: uri
+          maxLength: 2048
+    FoodPatch:
+      type: object
+      minProperties: 1
+      description: A non-empty subset of food fields.
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        brand:
+          type: [string, "null"]
+          maxLength: 120
+        servingUnit:
+          type: string
+          enum: [g, ml]
+        caloriesPer100:
+          type: number
+          minimum: 0
+          maximum: 1000
+        proteinPer100:
+          type: number
+          minimum: 0
+          maximum: 100
+        carbohydratesPer100:
+          type: number
+          minimum: 0
+          maximum: 100
+        fatPer100:
+          type: number
+          minimum: 0
+          maximum: 100
+        fiberPer100:
+          type: number
+          minimum: 0
+          maximum: 100
+        sodiumMgPer100:
+          type: number
+          minimum: 0
+          maximum: 100000
+        calciumMgPer100:
+          type: number
+          minimum: 0
+          maximum: 100000
+        ironMgPer100:
+          type: number
+          minimum: 0
+          maximum: 10000
+        potassiumMgPer100:
+          type: number
+          minimum: 0
+          maximum: 100000
+        magnesiumMgPer100:
+          type: number
+          minimum: 0
+          maximum: 100000
+        sourceLabel:
+          type: string
+          maxLength: 200
+        sourceUrl:
+          type: [string, "null"]
+          format: uri
+          maxLength: 2048
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

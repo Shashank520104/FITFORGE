@@ -1,0 +1,247 @@
+openapi: 3.1.0
+info:
+  title: FITFORGE Progress Service
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/progress/measurements:
+    get:
+      summary: List owner-scoped body measurements
+      parameters:
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 100
+      responses:
+        "200":
+          description: Measurements for the authenticated user
+    post:
+      summary: Create or replace a body measurement for a date
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [measuredOn, weightKg]
+              properties:
+                measuredOn:
+                  type: string
+                  format: date
+                weightKg:
+                  type: number
+                bodyFatPercent:
+                  type: number
+                note:
+                  type: string
+      responses:
+        "201":
+          description: Measurement stored
+        "400":
+          description: Invalid measurement
+  /api/v1/progress/strength-records:
+    get:
+      summary: List strength history
+      parameters:
+        - in: query
+          name: exercise
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 100
+      responses:
+        "200":
+          description: Strength records for the authenticated user
+    post:
+      summary: Log strength performance and calculate a max-load personal record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [exerciseName, performedAt, weightKg, repetitions]
+              properties:
+                exerciseName:
+                  type: string
+                exerciseId:
+                  type: string
+                performedAt:
+                  type: string
+                  format: date
+                weightKg:
+                  type: number
+                repetitions:
+                  type: integer
+                note:
+                  type: string
+      responses:
+        "201":
+          description: Strength record stored
+        "400":
+          description: Invalid strength record
+  /api/v1/progress/summary:
+    get:
+      summary: Get recent measurements and max-load records
+      responses:
+        "200":
+          description: Progress summary for the authenticated user
+  /api/v1/activity:
+    get:
+      summary: Read activities and sleep for a date
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Manual activity and sleep records with daily duration totals
+  /api/v1/activity/summary:
+    get:
+      summary: Read daily activity and sleep totals for up to 31 days
+      parameters:
+        - in: query
+          name: from
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: to
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Daily activity minutes, distance, and sleep minutes
+        "400":
+          description: Invalid date range
+  /api/v1/activity/activities:
+    post:
+      summary: Log a daily activity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                [activityDate, activityTime, activityType, durationMinutes]
+              properties:
+                activityDate:
+                  type: string
+                  format: date
+                activityTime:
+                  type: string
+                  pattern: "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+                activityType:
+                  type: string
+                  enum: [walking, running, cycling, strength, yoga, other]
+                durationMinutes:
+                  type: integer
+                  minimum: 1
+                  maximum: 1440
+                distanceKm:
+                  type: number
+                note:
+                  type: string
+      responses:
+        "201":
+          description: Activity recorded
+        "400":
+          description: Invalid activity
+  /api/v1/activity/activities/{id}:
+    delete:
+      summary: Delete an owned activity record
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Activity deleted
+        "404":
+          description: Activity not found
+  /api/v1/activity/sleep:
+    post:
+      summary: Log sleep from bedtime and wake-up time
+      description: Sleep date represents the date the user woke up.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sleepDate, bedtime, wakeTime]
+              properties:
+                sleepDate:
+                  type: string
+                  format: date
+                bedtime:
+                  type: string
+                  pattern: "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+                wakeTime:
+                  type: string
+                  pattern: "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+                note:
+                  type: string
+      responses:
+        "201":
+          description: Sleep duration calculated and recorded
+        "400":
+          description: Invalid sleep record
+  /api/v1/activity/sleep/{id}:
+    delete:
+      summary: Delete an owned sleep record
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Sleep record deleted
+        "404":
+          description: Sleep record not found
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

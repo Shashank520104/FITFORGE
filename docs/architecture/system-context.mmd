@@ -1,0 +1,13 @@
+flowchart LR
+    User[Fitness platform user] -->|HTTPS/API| Gateway[API Gateway]
+    Gateway --> Auth[Auth Service]
+    Gateway --> Workout[Workout Service]
+    Gateway --> Nutrition[Nutrition Service]
+    Gateway --> Progress[Progress Service]
+    Gateway --> Profile[Profile Service]
+    Auth -->|Account and refresh-session ownership| AuthDB[(Auth PostgreSQL)]
+    Workout -->|Exercise and plan ownership| MongoDB[(Workout MongoDB)]
+    Nutrition -->|Food and meal-log ownership| NutritionDB[(Nutrition PostgreSQL)]
+    Gateway -. "not implemented" .-> AI[AI Service]
+    Progress -->|Measurements and strength records| ProgressDB[(Progress PostgreSQL)]
+    Profile -->|Private preferences| ProfileDB[(Profile PostgreSQL)]

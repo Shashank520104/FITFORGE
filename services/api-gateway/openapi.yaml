@@ -1,0 +1,592 @@
+openapi: 3.1.0
+info:
+  title: FITFORGE API
+  version: 1.0.0
+  description: Gateway API for FITFORGE authentication, training, nutrition, progress, and profile services.
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: Auth
+  - name: Exercises
+  - name: Workouts
+  - name: Nutrition
+  - name: AI Coach
+  - name: Progress
+  - name: Activity & Sleep
+  - name: Profile
+paths:
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register an account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+      responses:
+        "201":
+          description: Account created.
+        "400":
+          description: Invalid credentials.
+        "409":
+          description: Email is already registered.
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate an account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+      responses:
+        "200":
+          description: Authenticated; refresh token is set as an HttpOnly cookie.
+        "401":
+          description: Invalid credentials.
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Rotate a refresh session
+      responses:
+        "200":
+          description: Session rotated.
+        "204":
+          description: No refresh session is available.
+        "401":
+          description: Refresh session is expired or already used.
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Revoke a refresh session
+      responses:
+        "204":
+          description: Session revoked.
+  /api/v1/auth/me:
+    get:
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      summary: Read the current account
+      responses:
+        "200":
+          description: Current account.
+        "401":
+          description: Authentication required.
+  /api/v1/exercises:
+    get:
+      tags: [Exercises]
+      summary: Search the exercise catalogue
+      parameters:
+        - in: query
+          name: muscle
+          schema:
+            type: string
+        - in: query
+          name: difficulty
+          schema:
+            type: string
+            enum: [beginner, intermediate, advanced]
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Matching exercises.
+        "400":
+          description: Invalid search parameters.
+  /api/v1/exercises/{id}:
+    get:
+      tags: [Exercises]
+      summary: Read an exercise
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Exercise details.
+        "404":
+          description: Exercise not found.
+  /api/v1/workout-plans:
+    get:
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      summary: List the current user's training plans
+      responses:
+        "200":
+          description: Training plans.
+    post:
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      summary: Create a training plan
+      responses:
+        "201":
+          description: Training plan created.
+  /api/v1/workout-sessions:
+    get:
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      summary: List workout history and the active session
+      responses:
+        "200":
+          description: Workout session history.
+    post:
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      summary: Start a workout from a training plan
+      responses:
+        "201":
+          description: Workout session started.
+  /api/v1/workout-sessions/insights:
+    get:
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      summary: Read descriptive progress insights
+      responses:
+        "200":
+          description: Insights computed from completed, logged sets.
+  /api/v1/workout-sessions/insights/jobs/{jobId}:
+    get:
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      summary: Read the status of an insight refresh job
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job state and result when complete.
+        "404":
+          description: Job not found for the current user.
+  /api/v1/workout-sessions/{id}/finish:
+    post:
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      summary: Finish a workout and enqueue an insight refresh
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Workout finished; analytics refresh status is included.
+  /api/v1/foods:
+    get:
+      tags: [Nutrition]
+      security:
+        - bearerAuth: []
+      summary: List user-entered foods
+      responses:
+        "200":
+          description: Food entries.
+    post:
+      tags: [Nutrition]
+      security:
+        - bearerAuth: []
+      summary: Create a sourced food entry
+      responses:
+        "201":
+          description: Food entry created.
+  /api/v1/nutrition/logs:
+    get:
+      tags: [Nutrition]
+      security:
+        - bearerAuth: []
+      summary: Read meal logs
+      responses:
+        "200":
+          description: Meal logs and totals.
+    post:
+      tags: [Nutrition]
+      security:
+        - bearerAuth: []
+      summary: Log a meal
+      responses:
+        "201":
+          description: Meal logged.
+  /api/v1/coach/chat:
+    post:
+      tags: [AI Coach]
+      security:
+        - bearerAuth: []
+      summary: Ask the local AI fitness coach
+      description: General fitness and healthy-habit education. Not medical advice. Conversation history is supplied by the caller and is not stored.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [question]
+              properties:
+                question:
+                  type: string
+                  minLength: 1
+                  maxLength: 1000
+                history:
+                  type: array
+                  maxItems: 8
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required: [role, content]
+                    properties:
+                      role:
+                        type: string
+                        enum: [user, assistant]
+                      content:
+                        type: string
+                        minLength: 1
+                        maxLength: 1000
+      responses:
+        "200":
+          description: Coach response generated by the local AI model.
+        "401":
+          description: Authentication required.
+        "503":
+          description: Local model is missing.
+        "504":
+          description: Local model timed out.
+  /api/v1/coach/stream:
+    post:
+      tags: [AI Coach]
+      security:
+        - bearerAuth: []
+      summary: Stream a local AI fitness coach answer
+      description: Streams general fitness and healthy-habit education as server-sent events. Not medical advice. Conversation history is supplied by the caller and is not stored.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [question]
+              properties:
+                question:
+                  type: string
+                  minLength: 1
+                  maxLength: 1000
+                history:
+                  type: array
+                  maxItems: 8
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required: [role, content]
+                    properties:
+                      role:
+                        type: string
+                        enum: [user, assistant]
+                      content:
+                        type: string
+                        minLength: 1
+                        maxLength: 1000
+      responses:
+        "200":
+          description: Coach answer streamed as token, done, or error events.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "401":
+          description: Authentication required.
+        "503":
+          description: Local model is missing.
+        "504":
+          description: Local model timed out.
+  /api/v1/progress/summary:
+    get:
+      tags: [Progress]
+      security:
+        - bearerAuth: []
+      summary: Read a progress summary
+      responses:
+        "200":
+          description: Measurements and personal records.
+  /api/v1/progress/measurements:
+    get:
+      tags: [Progress]
+      security:
+        - bearerAuth: []
+      summary: List body measurements
+      responses:
+        "200":
+          description: Measurements.
+    post:
+      tags: [Progress]
+      security:
+        - bearerAuth: []
+      summary: Record a body measurement
+      responses:
+        "201":
+          description: Measurement recorded.
+  /api/v1/activity:
+    get:
+      tags: [Activity & Sleep]
+      security:
+        - bearerAuth: []
+      summary: Read activities and sleep for a date
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Daily activity and sleep with duration totals.
+  /api/v1/activity/summary:
+    get:
+      tags: [Activity & Sleep]
+      security:
+        - bearerAuth: []
+      summary: Read activity and sleep progress for up to 31 days
+      parameters:
+        - in: query
+          name: from
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: to
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Daily activity duration, distance, and sleep duration.
+  /api/v1/activity/activities:
+    post:
+      tags: [Activity & Sleep]
+      security:
+        - bearerAuth: []
+      summary: Record a manual activity
+      description: Records the local start time, duration, and optional distance for an activity.
+      responses:
+        "201":
+          description: Activity recorded.
+  /api/v1/activity/activities/{id}:
+    delete:
+      tags: [Activity & Sleep]
+      security:
+        - bearerAuth: []
+      summary: Delete an activity record
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Activity deleted.
+  /api/v1/activity/sleep:
+    post:
+      tags: [Activity & Sleep]
+      security:
+        - bearerAuth: []
+      summary: Record sleep from bedtime and wake-up time
+      responses:
+        "201":
+          description: Sleep record created.
+  /api/v1/activity/sleep/{id}:
+    delete:
+      tags: [Activity & Sleep]
+      security:
+        - bearerAuth: []
+      summary: Delete a sleep record
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Sleep record deleted.
+  /api/v1/profile:
+    get:
+      tags: [Profile]
+      security:
+        - bearerAuth: []
+      summary: Read private profile preferences
+      responses:
+        "200":
+          description: Profile preferences.
+    patch:
+      tags: [Profile]
+      security:
+        - bearerAuth: []
+      summary: Update profile preferences
+      responses:
+        "200":
+          description: Profile updated.
+  /api/v1/wellness/profile:
+    get:
+      tags: [Wellness]
+      security:
+        - bearerAuth: []
+      summary: Read personal wellness preferences
+      responses:
+        "200":
+          description: Preferences or null when not yet set.
+    put:
+      tags: [Wellness]
+      security:
+        - bearerAuth: []
+      summary: Save height, weight, diet, experience, and exercise confirmation
+      description: AI does not assess or verify exercise safety.
+      responses:
+        "200":
+          description: Preferences saved.
+        "400":
+          description: Invalid preferences.
+  /api/v1/wellness/reports:
+    get:
+      tags: [Wellness]
+      security:
+        - bearerAuth: []
+      summary: List private medical report metadata
+      responses:
+        "200":
+          description: User-owned report metadata.
+    post:
+      tags: [Wellness]
+      security:
+        - bearerAuth: []
+      summary: Upload a private encrypted medical report
+      description: Upload PDF, JPEG, or PNG (up to 8 MB). Upload clears workout confirmation.
+      parameters:
+        - in: header
+          name: X-File-Name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/png:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "201":
+          description: Report stored.
+        "413":
+          description: Report exceeds 8 MB.
+  /api/v1/wellness/reports/{reportId}/summary:
+    post:
+      tags: [Wellness]
+      security:
+        - bearerAuth: []
+      summary: Create a non-diagnostic summary of a report
+      description: Extracts report text locally and sends it to local Ollama only on explicit request. Summary is not stored.
+      parameters:
+        - in: path
+          name: reportId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Ephemeral summary and clinician warning.
+        "422":
+          description: No readable text found.
+  /api/v1/wellness/reports/{reportId}:
+    delete:
+      tags: [Wellness]
+      security:
+        - bearerAuth: []
+      summary: Delete an owned report
+      parameters:
+        - in: path
+          name: reportId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report deleted.
+  /api/v1/wellness/plan:
+    get:
+      tags: [Wellness]
+      security:
+        - bearerAuth: []
+      summary: Read the saved seven-day wellness plan
+      responses:
+        "200":
+          description: Meal suggestions and workout suggestions only when explicitly cleared.
+  /api/v1/wellness/plan/generate:
+    post:
+      tags: [Wellness]
+      security:
+        - bearerAuth: []
+      summary: Generate personalized seven-day meal and workout ideas
+      description: General lifestyle suggestions only. With no clinician clearance, workout ideas are withheld. Reports are not used in plan generation.
+      responses:
+        "200":
+          description: Seven-day meal ideas and, if cleared, conservative movement ideas.
+        "409":
+          description: Wellness preferences must be saved first.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+  schemas:
+    Credentials:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          minLength: 12
+          maxLength: 72

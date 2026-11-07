@@ -1,0 +1,12 @@
+flowchart LR
+    Status["NOT IMPLEMENTED<br/>No AI service, source corpus, embeddings, or vector database is present"]
+    Status -. "future only; not an active data flow" .-> Sources["Curated, licensed sources"]
+    Sources -.-> Normalize["Normalize and validate"]
+    Normalize -.-> Chunk["Chunk with source metadata"]
+    Chunk -.-> Embed["Provider abstraction and embeddings"]
+    Embed -.-> Qdrant[(Qdrant)]
+    Query["User question"] -.-> Retrieve["Metadata-filtered retrieval"]
+    Qdrant -.-> Retrieve
+    Retrieve -.-> Ground["Bounded cited context"]
+    Ground -.-> Generate["Schema-validated grounded answer"]
+    Generate -.-> Evaluate["Fixed retrieval and grounding evaluations"]

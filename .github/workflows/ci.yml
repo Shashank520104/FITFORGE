@@ -1,0 +1,207 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run lint
+      - run: npm run format:check
+
+  service-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          [
+            auth-service,
+            api-gateway,
+            workout-service,
+            nutrition-service,
+            progress-service,
+            profile-service,
+          ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+      - run: npm ci
+        working-directory: services/${{ matrix.service }}
+      - run: npm run build
+        working-directory: services/${{ matrix.service }}
+      - run: npm test
+        working-directory: services/${{ matrix.service }}
+
+  docker-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Auth Service image
+        run: docker build --tag fitforge-auth-service:ci services/auth-service
+      - name: Build API Gateway image
+        run: docker build --tag fitforge-api-gateway:ci services/api-gateway
+      - name: Build Workout Service image
+        run: docker build --tag fitforge-workout-service:ci services/workout-service
+      - name: Build Nutrition Service image
+        run: docker build --tag fitforge-nutrition-service:ci services/nutrition-service
+      - name: Build Progress Service image
+        run: docker build --tag fitforge-progress-service:ci services/progress-service
+      - name: Build Profile Service image
+        run: docker build --tag fitforge-profile-service:ci services/profile-service
+      - name: Build frontend image
+        run: docker build --tag fitforge-frontend:ci frontend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run lint
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+
+  database-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: fitforge_auth_test
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d fitforge_auth_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+      mongodb:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok'"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Create ephemeral test signing key
+        run: echo "JWT_SECRET=$(node -e \"process.stdout.write(require('node:crypto').randomBytes(32).toString('base64url'))\")" >> "$GITHUB_ENV"
+      - name: Install Auth Service
+        run: npm ci
+        working-directory: services/auth-service
+      - name: Apply Auth Service migrations
+        run: npm run migrate
+        working-directory: services/auth-service
+        env:
+          DATABASE_URL: postgres://postgres@localhost:5432/fitforge_auth_test
+      - name: Run Auth Service database integration tests
+        run: npm test
+        working-directory: services/auth-service
+        env:
+          AUTH_TEST_DATABASE_URL: postgres://postgres@localhost:5432/fitforge_auth_test
+          DATABASE_URL: postgres://postgres@localhost:5432/fitforge_auth_test
+      - name: Install API Gateway
+        run: npm ci
+        working-directory: services/api-gateway
+      - name: Run API Gateway Redis rate-limit integration tests
+        run: npm test
+        working-directory: services/api-gateway
+        env:
+          REDIS_TEST_URL: redis://localhost:6379
+      - name: Install Workout Service
+        run: npm ci
+        working-directory: services/workout-service
+      - name: Run Workout Service database integration tests
+        run: npm test
+        working-directory: services/workout-service
+        env:
+          WORKOUT_TEST_MONGODB_URI: mongodb://localhost:27017/fitforge_workout_test
+          WORKOUT_TEST_REDIS_URL: redis://localhost:6379
+      - name: Create Progress test database
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "CREATE DATABASE fitforge_progress_test"
+      - name: Install Progress Service
+        run: npm ci
+        working-directory: services/progress-service
+      - name: Apply Progress Service migrations
+        run: npm run migrate
+        working-directory: services/progress-service
+        env:
+          DATABASE_URL: postgres://postgres@localhost:5432/fitforge_progress_test
+          JWT_SECRET: ${{ env.JWT_SECRET }}
+      - name: Run Progress Service database integration tests
+        run: npm test
+        working-directory: services/progress-service
+        env:
+          DATABASE_URL: postgres://postgres@localhost:5432/fitforge_progress_test
+          PROGRESS_TEST_DATABASE_URL: postgres://postgres@localhost:5432/fitforge_progress_test
+      - name: Create Profile test database
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "CREATE DATABASE fitforge_profile_test"
+      - name: Install Profile Service
+        run: npm ci
+        working-directory: services/profile-service
+      - name: Apply Profile Service migrations
+        run: npm run migrate
+        working-directory: services/profile-service
+        env:
+          DATABASE_URL: postgres://postgres@localhost:5432/fitforge_profile_test
+          JWT_SECRET: ${{ env.JWT_SECRET }}
+      - name: Run Profile Service database integration tests
+        run: npm test
+        working-directory: services/profile-service
+        env:
+          DATABASE_URL: postgres://postgres@localhost:5432/fitforge_profile_test
+          PROFILE_TEST_DATABASE_URL: postgres://postgres@localhost:5432/fitforge_profile_test
+      - name: Create Nutrition test database
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "CREATE DATABASE fitforge_nutrition_test"
+      - name: Install Nutrition Service
+        run: npm ci
+        working-directory: services/nutrition-service
+      - name: Apply Nutrition Service migrations
+        run: npm run migrate
+        working-directory: services/nutrition-service
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/fitforge_nutrition_test
+          JWT_SECRET: ${{ env.JWT_SECRET }}
+      - name: Run Nutrition Service database integration tests
+        run: npm test
+        working-directory: services/nutrition-service
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/fitforge_nutrition_test
+          NUTRITION_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/fitforge_nutrition_test

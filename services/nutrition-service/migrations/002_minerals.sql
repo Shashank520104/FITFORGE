@@ -1,0 +1,11 @@
+ALTER TABLE foods
+  ADD COLUMN calcium_mg_per_100 NUMERIC(8, 2) NOT NULL DEFAULT 0 CHECK (calcium_mg_per_100 BETWEEN 0 AND 100000),
+  ADD COLUMN iron_mg_per_100 NUMERIC(8, 2) NOT NULL DEFAULT 0 CHECK (iron_mg_per_100 BETWEEN 0 AND 10000),
+  ADD COLUMN potassium_mg_per_100 NUMERIC(8, 2) NOT NULL DEFAULT 0 CHECK (potassium_mg_per_100 BETWEEN 0 AND 100000),
+  ADD COLUMN magnesium_mg_per_100 NUMERIC(8, 2) NOT NULL DEFAULT 0 CHECK (magnesium_mg_per_100 BETWEEN 0 AND 100000);
+
+ALTER TABLE meal_log_items
+  ADD COLUMN calcium_mg NUMERIC(10, 2) NOT NULL DEFAULT 0 CHECK (calcium_mg >= 0),
+  ADD COLUMN iron_mg NUMERIC(10, 2) NOT NULL DEFAULT 0 CHECK (iron_mg >= 0),
+  ADD COLUMN potassium_mg NUMERIC(10, 2) NOT NULL DEFAULT 0 CHECK (potassium_mg >= 0),
+  ADD COLUMN magnesium_mg NUMERIC(10, 2) NOT NULL DEFAULT 0 CHECK (magnesium_mg >= 0);

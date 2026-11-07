@@ -1,0 +1,2 @@
+ALTER TABLE activity_logs
+  ADD COLUMN IF NOT EXISTS activity_time TIME NOT NULL DEFAULT '12:00';
