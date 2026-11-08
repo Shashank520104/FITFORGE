@@ -1,6 +1,13 @@
 # FITFORGE
 
-FITFORGE is an incremental Indian fitness and nutrition platform. The repository contains an API Gateway, independently runnable authentication, workout, nutrition, progress, profile, and personalization services, plus a responsive React web app. The legacy backend remains during the migration; nutrition AI beyond food estimates, evaluated RAG, and several production operations remain outstanding.
+[![CI](https://github.com/Shashank520104/FITFORGE/actions/workflows/ci.yml/badge.svg)](https://github.com/Shashank520104/FITFORGE/actions/workflows/ci.yml)
+[![Node.js](https://img.shields.io/badge/Node.js-22_LTS-green.svg)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+FITFORGE is an enterprise-grade fitness and nutrition intelligence platform built with a distributed microservices architecture. It features an API Gateway, independently runnable and containerized authentication, workout, nutrition, progress, profile, and personalization services, alongside a responsive React 19 web application with interactive D3 data visualizations.
 
 ## Current architecture
 
