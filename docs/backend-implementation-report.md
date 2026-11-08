@@ -37,17 +37,17 @@ flowchart LR
 
 ## 3. Microservices and responsibilities
 
-| Component | Responsibility | Main technology and data |
-|---|---|---|
-| API Gateway | Public API entry point, routing, request IDs/logging, token checks, bounded proxying, shared rate limiting, API documentation | Express, TypeScript, Redis, OpenAPI/Swagger |
-| Auth Service | Registration, login, password verification, access tokens, refresh rotation/logout, current-account endpoint | Express, TypeScript, PostgreSQL, bcrypt, JWT |
-| Workout Service | Public exercise catalogue; authenticated plans, sessions, set logging, history, and descriptive progression insights | Express, TypeScript, MongoDB/Mongoose, Redis |
-| Workout Insights Worker | Asynchronous refresh of owner-scoped workout insight cache entries | BullMQ, Redis, MongoDB |
-| Nutrition Service | User-owned custom foods, meal logs, nutrient totals, and immutable item snapshots | Express, TypeScript, dedicated PostgreSQL database |
-| Progress Service | Body measurements, strength logs, max-load personal records, and summary endpoints | Express, TypeScript, dedicated PostgreSQL database |
-| Profile Service | User preferences for units, training goals, experience, equipment, and dietary labels | Express, TypeScript, dedicated PostgreSQL database |
-| Web App | Registration/sign-in and user flows for workouts, nutrition, progress, and profile | React, TypeScript, Vite |
-| Redis | Shared Gateway rate-limit windows, Workout cache, and background job queue | Redis |
+| Component               | Responsibility                                                                                                                | Main technology and data                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| API Gateway             | Public API entry point, routing, request IDs/logging, token checks, bounded proxying, shared rate limiting, API documentation | Express, TypeScript, Redis, OpenAPI/Swagger        |
+| Auth Service            | Registration, login, password verification, access tokens, refresh rotation/logout, current-account endpoint                  | Express, TypeScript, PostgreSQL, bcrypt, JWT       |
+| Workout Service         | Public exercise catalogue; authenticated plans, sessions, set logging, history, and descriptive progression insights          | Express, TypeScript, MongoDB/Mongoose, Redis       |
+| Workout Insights Worker | Asynchronous refresh of owner-scoped workout insight cache entries                                                            | BullMQ, Redis, MongoDB                             |
+| Nutrition Service       | User-owned custom foods, meal logs, nutrient totals, and immutable item snapshots                                             | Express, TypeScript, dedicated PostgreSQL database |
+| Progress Service        | Body measurements, strength logs, max-load personal records, and summary endpoints                                            | Express, TypeScript, dedicated PostgreSQL database |
+| Profile Service         | User preferences for units, training goals, experience, equipment, and dietary labels                                         | Express, TypeScript, dedicated PostgreSQL database |
+| Web App                 | Registration/sign-in and user flows for workouts, nutrition, progress, and profile                                            | React, TypeScript, Vite                            |
+| Redis                   | Shared Gateway rate-limit windows, Workout cache, and background job queue                                                    | Redis                                              |
 
 Services have separate package manifests, build/test scripts, API contracts, and Docker build contexts under [`services/`](../services/). The older [`backend/`](../backend/) directory is the legacy monolithic implementation retained during migration; the independent services are the active microservice structure.
 
@@ -57,44 +57,44 @@ Compose provisions one PostgreSQL server with separate databases and owner roles
 
 ### Auth PostgreSQL
 
-| Table | Important fields and constraints | Purpose |
-|---|---|---|
-| `users` | UUID primary key, unique email, password hash, creation/update timestamps | Account identity and credential storage |
-| `refresh_sessions` | UUID primary key, user foreign key with cascade delete, unique token digest, expiry/revocation timestamps; indexes for user and active sessions | Refresh-token rotation and revocation |
+| Table              | Important fields and constraints                                                                                                                | Purpose                                 |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `users`            | UUID primary key, unique email, password hash, creation/update timestamps                                                                       | Account identity and credential storage |
+| `refresh_sessions` | UUID primary key, user foreign key with cascade delete, unique token digest, expiry/revocation timestamps; indexes for user and active sessions | Refresh-token rotation and revocation   |
 
 Passwords are stored as bcrypt hashes. Refresh tokens are opaque values; only their SHA-256 digests are persisted.
 
 ### Workout MongoDB
 
-| Collection | Main data | Important design |
-|---|---|---|
-| `exercises` | Name, muscle groups, equipment, difficulty, movement type, description, optional media URLs | Mongoose validation and indexes support catalogue filters |
-| `workoutplans` | Owner ID, name, goal, embedded days, planned exercises and sets | Bounded aggregate; planned exercises reference catalogue IDs; owner/update index |
+| Collection        | Main data                                                                                           | Important design                                                                                                   |
+| ----------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `exercises`       | Name, muscle groups, equipment, difficulty, movement type, description, optional media URLs         | Mongoose validation and indexes support catalogue filters                                                          |
+| `workoutplans`    | Owner ID, name, goal, embedded days, planned exercises and sets                                     | Bounded aggregate; planned exercises reference catalogue IDs; owner/update index                                   |
 | `workoutsessions` | Owner, source plan metadata, selected-day snapshot, planned and actual set data, status, timestamps | History survives plan changes; owner/start index; partial unique index allows at most one active session per owner |
 
 Plans are limited to seven days, twelve exercises per day, and ten sets per exercise. API validation constrains reps, load, and rest time. Session documents snapshot plan and exercise details so later edits do not rewrite history.
 
 ### Nutrition PostgreSQL
 
-| Table | Important fields and constraints | Purpose |
-|---|---|---|
-| `foods` | Owner ID, name/brand, g/ml serving unit, nutrient values per 100 units, source label/URL | Caller-entered foods with source attribution; owner/name index |
-| `meal_logs` | Owner ID, date, meal type | Dated owner-scoped meal records; owner/date index |
-| `meal_log_items` | Log ID, food ID, food/nutrient/source snapshots, serving amount | Preserves historical values if a food is later changed or deleted |
+| Table            | Important fields and constraints                                                         | Purpose                                                           |
+| ---------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `foods`          | Owner ID, name/brand, g/ml serving unit, nutrient values per 100 units, source label/URL | Caller-entered foods with source attribution; owner/name index    |
+| `meal_logs`      | Owner ID, date, meal type                                                                | Dated owner-scoped meal records; owner/date index                 |
+| `meal_log_items` | Log ID, food ID, food/nutrient/source snapshots, serving amount                          | Preserves historical values if a food is later changed or deleted |
 
 Meal creation snapshots the selected food values transactionally. Nutrition values are user-provided; the service does not claim a verified shared food catalogue.
 
 ### Progress PostgreSQL
 
-| Table | Important fields and constraints | Purpose |
-|---|---|---|
-| `body_measurements` | Owner ID, date, weight, optional body-fat percentage/note; unique owner/date | Measurement history and date-based lookup |
-| `strength_records` | Owner ID, exercise name/optional ID, date, load, reps, optional note | Strength history and max-load personal-record calculation |
+| Table               | Important fields and constraints                                             | Purpose                                                   |
+| ------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `body_measurements` | Owner ID, date, weight, optional body-fat percentage/note; unique owner/date | Measurement history and date-based lookup                 |
+| `strength_records`  | Owner ID, exercise name/optional ID, date, load, reps, optional note         | Strength history and max-load personal-record calculation |
 
 ### Profile PostgreSQL
 
-| Table | Important fields and constraints | Purpose |
-|---|---|---|
+| Table           | Important fields and constraints                                                                              | Purpose                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | `user_profiles` | Owner ID primary key, display name, units, training goal, experience, equipment and dietary-preference arrays | Private preferences with enum and array-size/value constraints |
 
 ### Consistency and privacy

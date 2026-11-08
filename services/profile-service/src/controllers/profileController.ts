@@ -50,7 +50,9 @@ export class ProfileController {
   constructor(private readonly repository: ProfileRepository) {}
 
   getProfile = async (_req: Request, res: Response): Promise<void> => {
-    const profile = await this.repository.getOrCreateProfile(res.locals.ownerId);
+    const profile = await this.repository.getOrCreateProfile(
+      res.locals.ownerId,
+    );
     res.status(200).json({ success: true, data: profile });
   };
 

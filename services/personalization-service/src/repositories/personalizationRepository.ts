@@ -56,9 +56,10 @@ export class PersonalizationRepository {
         profile.exerciseCleared,
       ],
     );
-    await this.pool.query("DELETE FROM personalized_plans WHERE owner_id = $1", [
-      ownerId,
-    ]);
+    await this.pool.query(
+      "DELETE FROM personalized_plans WHERE owner_id = $1",
+      [ownerId],
+    );
     return result.rows[0];
   }
 
@@ -138,7 +139,10 @@ export class PersonalizationRepository {
   async getPlan(
     ownerId: string,
   ): Promise<{ plan: WellnessPlanRecord; generatedAt: string } | null> {
-    const result = await this.pool.query<{ plan: WellnessPlanRecord; generatedAt: string }>(
+    const result = await this.pool.query<{
+      plan: WellnessPlanRecord;
+      generatedAt: string;
+    }>(
       `SELECT plan, generated_at AS "generatedAt"
        FROM personalized_plans WHERE owner_id = $1`,
       [ownerId],

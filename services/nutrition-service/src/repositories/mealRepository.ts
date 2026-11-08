@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { MealLogRow, MealLogTotals } from "../types/index.js";
 
 export class MealRepository {
   constructor(private readonly pool: Pool) {}
@@ -80,8 +81,11 @@ export class MealRepository {
     }
   }
 
-  async getMealLogsByDate(ownerId: string, date: string): Promise<{ rows: any[]; total: any }> {
-    const result = await this.pool.query(
+  async getMealLogsByDate(
+    ownerId: string,
+    date: string,
+  ): Promise<{ rows: MealLogRow[]; total: MealLogTotals }> {
+    const result = await this.pool.query<MealLogRow>(
       `SELECT logs.id, logs.log_date, logs.meal_type,
             COALESCE(
               jsonb_agg(

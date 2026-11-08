@@ -32,6 +32,7 @@ jobs:
             nutrition-service,
             progress-service,
             profile-service,
+            personalization-service,
           ]
     steps:
       - uses: actions/checkout@v4
@@ -63,6 +64,8 @@ jobs:
         run: docker build --tag fitforge-progress-service:ci services/progress-service
       - name: Build Profile Service image
         run: docker build --tag fitforge-profile-service:ci services/profile-service
+      - name: Build Personalization Service image
+        run: docker build --tag fitforge-personalization-service:ci services/personalization-service
       - name: Build frontend image
         run: docker build --tag fitforge-frontend:ci frontend
 

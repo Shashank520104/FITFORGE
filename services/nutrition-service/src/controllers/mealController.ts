@@ -38,7 +38,10 @@ export class MealController {
     if (!parsed.success) {
       res.status(400).json({
         success: false,
-        error: { code: "INVALID_MEAL_LOG", message: z.prettifyError(parsed.error) },
+        error: {
+          code: "INVALID_MEAL_LOG",
+          message: z.prettifyError(parsed.error),
+        },
       });
       return;
     }
@@ -53,7 +56,10 @@ export class MealController {
     if (!logId) {
       res.status(422).json({
         success: false,
-        error: { code: "UNKNOWN_FOOD", message: "One or more foods are unavailable to this account" },
+        error: {
+          code: "UNKNOWN_FOOD",
+          message: "One or more foods are unavailable to this account",
+        },
       });
       return;
     }
@@ -74,12 +80,18 @@ export class MealController {
     if (!date.success) {
       res.status(400).json({
         success: false,
-        error: { code: "INVALID_DATE", message: "A valid YYYY-MM-DD date is required" },
+        error: {
+          code: "INVALID_DATE",
+          message: "A valid YYYY-MM-DD date is required",
+        },
       });
       return;
     }
 
-    const { rows, total } = await this.repository.getMealLogsByDate(ownerId, date.data);
+    const { rows, total } = await this.repository.getMealLogsByDate(
+      ownerId,
+      date.data,
+    );
     res.status(200).json({ success: true, data: rows, total });
   };
 
@@ -89,7 +101,10 @@ export class MealController {
     if (!id) {
       res.status(400).json({
         success: false,
-        error: { code: "INVALID_MEAL_LOG_ID", message: "Meal log ID must be a UUID" },
+        error: {
+          code: "INVALID_MEAL_LOG_ID",
+          message: "Meal log ID must be a UUID",
+        },
       });
       return;
     }

@@ -59,7 +59,10 @@ export class AuthService {
     plainPassword: string,
   ): Promise<{ data: AuthResponseData; refreshToken: string }> {
     const account = await this.repository.findUserByEmail(email);
-    if (!account || !(await bcrypt.compare(plainPassword, account.password_hash))) {
+    if (
+      !account ||
+      !(await bcrypt.compare(plainPassword, account.password_hash))
+    ) {
       throw new HttpError(
         401,
         "INVALID_CREDENTIALS",

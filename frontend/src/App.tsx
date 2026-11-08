@@ -194,11 +194,7 @@ function App() {
               {page === "progress" && <ProgressPage api={api} />}
               {page === "assistant" && <CoachPage apiStream={apiStream} />}
               {page === "account" && (
-                <AccountPage
-                  api={api}
-                  user={session.user}
-                  onLogout={logout}
-                />
+                <AccountPage api={api} user={session.user} onLogout={logout} />
               )}
             </div>
           </main>

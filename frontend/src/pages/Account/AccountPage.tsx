@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useState,
-  type FormEvent,
-} from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Notice } from "../../components/common/Notice.js";
 import { PageHeading } from "../../components/common/PageHeading.js";
 import type { ApiResponse, Profile, User } from "../../types/index.js";

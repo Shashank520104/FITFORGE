@@ -27,7 +27,10 @@ function verifyToken(jwtSecret: string): RequestHandler {
     if (!token) {
       res.status(401).json({
         success: false,
-        error: { code: "AUTHENTICATION_REQUIRED", message: "A bearer access token is required" },
+        error: {
+          code: "AUTHENTICATION_REQUIRED",
+          message: "A bearer access token is required",
+        },
       });
       return;
     }
@@ -42,7 +45,10 @@ function verifyToken(jwtSecret: string): RequestHandler {
     } catch {
       res.status(401).json({
         success: false,
-        error: { code: "INVALID_ACCESS_TOKEN", message: "Access token is invalid or expired" },
+        error: {
+          code: "INVALID_ACCESS_TOKEN",
+          message: "Access token is invalid or expired",
+        },
       });
     }
   };
@@ -69,14 +75,22 @@ export function createPersonalizationApp(
 
   // Probes
   app.get("/health", (_req, res) => {
-    res.status(200).json({ success: true, service: "personalization-service", status: "healthy" });
+    res.status(200).json({
+      success: true,
+      service: "personalization-service",
+      status: "healthy",
+    });
   });
 
   app.get(
     "/ready",
     asyncRoute(async (_req, res) => {
       await pool.query("SELECT 1");
-      res.status(200).json({ success: true, service: "personalization-service", status: "ready" });
+      res.status(200).json({
+        success: true,
+        service: "personalization-service",
+        status: "ready",
+      });
     }),
   );
 
@@ -123,7 +137,10 @@ export function createPersonalizationApp(
     );
     res.status(500).json({
       success: false,
-      error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" },
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "An unexpected error occurred",
+      },
     });
   };
 

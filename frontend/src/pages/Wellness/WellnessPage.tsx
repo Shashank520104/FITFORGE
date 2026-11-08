@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type FormEvent,
-} from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { PageHeading } from "../../components/common/PageHeading.js";
 import type {
   ApiResponse,
@@ -565,7 +560,9 @@ export function WellnessPage({
                           >
                             {isRest
                               ? "Rest"
-                              : workoutDay.focus.replace(/ & .*/, "").slice(0, 8)}
+                              : workoutDay.focus
+                                  .replace(/ & .*/, "")
+                                  .slice(0, 8)}
                           </span>
                         )}
                       </button>
@@ -600,28 +597,33 @@ export function WellnessPage({
                       {selectedWorkoutDay ? (
                         <>
                           <p className="wellness-focus">
-                            <strong>Daily Focus:</strong> {selectedWorkoutDay.focus}
+                            <strong>Daily Focus:</strong>{" "}
+                            {selectedWorkoutDay.focus}
                           </p>
                           {selectedWorkoutDay.activities.length > 0 ? (
-                            selectedWorkoutDay.activities.map((activity, idx) => (
-                              <article
-                                className="wellness-activity"
-                                key={`${activity.name}-${activity.minutes}-${idx}`}
-                              >
-                                <div>
-                                  <strong>{activity.name}</strong>
-                                  <span>
-                                    {activity.minutes} min · gentle pace
-                                  </span>
-                                </div>
-                                <p>{activity.guidance}</p>
-                              </article>
-                            ))
+                            selectedWorkoutDay.activities.map(
+                              (activity, idx) => (
+                                <article
+                                  className="wellness-activity"
+                                  key={`${activity.name}-${activity.minutes}-${idx}`}
+                                >
+                                  <div>
+                                    <strong>{activity.name}</strong>
+                                    <span>
+                                      {activity.minutes} min · gentle pace
+                                    </span>
+                                  </div>
+                                  <p>{activity.guidance}</p>
+                                </article>
+                              ),
+                            )
                           ) : (
                             <div className="wellness-rest-card">
                               <strong>Scheduled Rest & Recovery</strong>
                               <p>
-                                A designated rest day to allow muscles and joints to recover. Light stretching or a casual stroll is optional if it feels comfortable.
+                                A designated rest day to allow muscles and
+                                joints to recover. Light stretching or a casual
+                                stroll is optional if it feels comfortable.
                               </p>
                             </div>
                           )}

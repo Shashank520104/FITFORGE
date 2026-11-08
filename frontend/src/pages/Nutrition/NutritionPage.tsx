@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type FormEvent,
-} from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Notice } from "../../components/common/Notice.js";
 import { PageHeading } from "../../components/common/PageHeading.js";
 import { Stat } from "../../components/common/Stat.js";

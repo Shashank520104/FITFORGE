@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { NutritionConfig } from "../config.js";
 import { HttpError } from "../errors/httpError.js";
+import { FoodEstimate } from "../types/index.js";
 
 const nutrientFields = {
   caloriesPer100: z.number().min(0).max(1000),
@@ -21,7 +22,10 @@ const estimateJsonSchema = {
   type: "object",
   additionalProperties: false,
   properties: Object.fromEntries(
-    Object.entries(nutrientFields).map(([field]) => [field, { type: "number" }]),
+    Object.entries(nutrientFields).map(([field]) => [
+      field,
+      { type: "number" },
+    ]),
   ),
   required: Object.keys(nutrientFields),
 };
@@ -56,7 +60,7 @@ export class AiNutritionService {
     }
   }
 
-  async estimateFood(name: string, servingUnit: string): Promise<any> {
+  async estimateFood(name: string, servingUnit: string): Promise<FoodEstimate> {
     let response: Response;
     try {
       response = await fetch(`${this.config.OLLAMA_BASE_URL}/api/chat`, {
@@ -100,25 +104,43 @@ export class AiNutritionService {
           `Local model ${this.config.OLLAMA_MODEL} is not available. Pull it with "docker compose exec ollama ollama pull ${this.config.OLLAMA_MODEL}".`,
         );
       }
-      throw new HttpError(502, "AI_MODEL_ERROR", "Local AI food estimation could not be completed");
+      throw new HttpError(
+        502,
+        "AI_MODEL_ERROR",
+        "Local AI food estimation could not be completed",
+      );
     }
 
-    const completion: any = await response.json();
+    const completion = (await response.json()) as {
+      message?: { content?: string };
+    };
     const content = completion?.message?.content;
     if (!content) {
-      throw new HttpError(502, "AI_INVALID_RESPONSE", "AI food estimation returned no nutrition values");
+      throw new HttpError(
+        502,
+        "AI_INVALID_RESPONSE",
+        "AI food estimation returned no nutrition values",
+      );
     }
 
     let nutrition: unknown;
     try {
       nutrition = JSON.parse(content);
     } catch {
-      throw new HttpError(502, "AI_INVALID_RESPONSE", "AI food estimation returned invalid nutrition values");
+      throw new HttpError(
+        502,
+        "AI_INVALID_RESPONSE",
+        "AI food estimation returned invalid nutrition values",
+      );
     }
 
     const parsed = estimateSchema.safeParse(nutrition);
     if (!parsed.success) {
-      throw new HttpError(502, "AI_INVALID_RESPONSE", "AI food estimation returned out-of-range nutrition values");
+      throw new HttpError(
+        502,
+        "AI_INVALID_RESPONSE",
+        "AI food estimation returned out-of-range nutrition values",
+      );
     }
 
     return {
@@ -169,13 +191,23 @@ export class AiNutritionService {
           `Local model ${this.config.OLLAMA_MODEL} is not available. Pull it with "docker compose exec ollama ollama pull ${this.config.OLLAMA_MODEL}".`,
         );
       }
-      throw new HttpError(502, "AI_MODEL_ERROR", "The AI coach could not complete this response.");
+      throw new HttpError(
+        502,
+        "AI_MODEL_ERROR",
+        "The AI coach could not complete this response.",
+      );
     }
 
-    const completion: any = await response.json();
+    const completion = (await response.json()) as {
+      message?: { content?: string };
+    };
     const content = completion?.message?.content;
     if (!content) {
-      throw new HttpError(502, "AI_INVALID_RESPONSE", "The AI coach returned no usable answer.");
+      throw new HttpError(
+        502,
+        "AI_INVALID_RESPONSE",
+        "The AI coach returned no usable answer.",
+      );
     }
     return content;
   }

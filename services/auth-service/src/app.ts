@@ -25,14 +25,18 @@ export function createAuthApp(pool: Pool, config: AuthConfig): express.Express {
 
   // Health and readiness probes
   app.get("/health", (_req, res) => {
-    res.status(200).json({ success: true, service: "auth-service", status: "healthy" });
+    res
+      .status(200)
+      .json({ success: true, service: "auth-service", status: "healthy" });
   });
 
   app.get(
     "/ready",
     asyncRoute(async (_req, res) => {
       await pool.query("SELECT 1");
-      res.status(200).json({ success: true, service: "auth-service", status: "ready" });
+      res
+        .status(200)
+        .json({ success: true, service: "auth-service", status: "ready" });
     }),
   );
 

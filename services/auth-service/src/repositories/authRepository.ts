@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { AuthUser, UserRecord } from "../types/index.js";
 import { hashRefreshToken } from "../utils/token.js";
 

@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { NutritionConfig } from "../config.js";
 import { HttpError } from "../errors/httpError.js";
-import { AiNutritionService, coachSystemPrompt } from "../services/aiNutritionService.js";
+import {
+  AiNutritionService,
+  coachSystemPrompt,
+} from "../services/aiNutritionService.js";
 
 const coachInputSchema = z
   .object({
@@ -32,12 +35,18 @@ export class CoachController {
     if (!parsed.success) {
       res.status(400).json({
         success: false,
-        error: { code: "INVALID_COACH_MESSAGE", message: z.prettifyError(parsed.error) },
+        error: {
+          code: "INVALID_COACH_MESSAGE",
+          message: z.prettifyError(parsed.error),
+        },
       });
       return;
     }
 
-    const reply = await this.aiService.chatCoach(parsed.data.question, parsed.data.history);
+    const reply = await this.aiService.chatCoach(
+      parsed.data.question,
+      parsed.data.history,
+    );
     res.status(200).json({
       success: true,
       data: {
@@ -53,7 +62,10 @@ export class CoachController {
     if (!parsed.success) {
       res.status(400).json({
         success: false,
-        error: { code: "INVALID_COACH_MESSAGE", message: z.prettifyError(parsed.error) },
+        error: {
+          code: "INVALID_COACH_MESSAGE",
+          message: z.prettifyError(parsed.error),
+        },
       });
       return;
     }
@@ -70,7 +82,7 @@ export class CoachController {
     res.once("close", cancelOnClose);
 
     try {
-      let response: any;
+      let response: Response;
       try {
         response = await fetch(`${this.config.OLLAMA_BASE_URL}/api/chat`, {
           method: "POST",
@@ -109,10 +121,18 @@ export class CoachController {
             `Local model ${this.config.OLLAMA_MODEL} is not available. Pull it with "docker compose exec ollama ollama pull ${this.config.OLLAMA_MODEL}".`,
           );
         }
-        throw new HttpError(502, "AI_MODEL_ERROR", "The AI coach could not complete this response.");
+        throw new HttpError(
+          502,
+          "AI_MODEL_ERROR",
+          "The AI coach could not complete this response.",
+        );
       }
       if (!response.body) {
-        throw new HttpError(502, "AI_INVALID_RESPONSE", "The AI coach returned an invalid response.");
+        throw new HttpError(
+          502,
+          "AI_INVALID_RESPONSE",
+          "The AI coach returned an invalid response.",
+        );
       }
 
       res.status(200).set({
@@ -135,9 +155,12 @@ export class CoachController {
 
       const processLine = (line: string) => {
         if (!line.trim()) return;
-        let chunk: any;
+        let chunk: { message?: { content?: string }; done?: boolean };
         try {
-          chunk = JSON.parse(line);
+          chunk = JSON.parse(line) as {
+            message?: { content?: string };
+            done?: boolean;
+          };
         } catch {
           throw new Error("Ollama returned malformed stream data");
         }

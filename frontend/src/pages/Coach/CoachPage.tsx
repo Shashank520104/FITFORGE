@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-} from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { PageHeading } from "../../components/common/PageHeading.js";
 import type { CoachMessage } from "../../types/index.js";
 

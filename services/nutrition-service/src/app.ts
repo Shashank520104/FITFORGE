@@ -93,7 +93,11 @@ export function createNutritionApp(
   const authMiddleware = verifyToken(config.JWT_SECRET);
   app.use("/api/v1/foods", authMiddleware, createFoodRouter(foodController));
   app.use("/api/v1/coach", authMiddleware, createCoachRouter(coachController));
-  app.use("/api/v1/nutrition/logs", authMiddleware, createMealRouter(mealController));
+  app.use(
+    "/api/v1/nutrition/logs",
+    authMiddleware,
+    createMealRouter(mealController),
+  );
 
   // 404 Route Handler
   app.use((_req, res) => {

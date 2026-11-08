@@ -1,4 +1,9 @@
 import { Pool } from "pg";
+import {
+  CreateFoodInput,
+  FoodRecord,
+  UpdateFoodPatch,
+} from "../types/index.js";
 
 export class FoodRepository {
   constructor(private readonly pool: Pool) {}
@@ -8,8 +13,8 @@ export class FoodRepository {
     search: string,
     limit: number,
     offset: number,
-  ): Promise<any[]> {
-    const result = await this.pool.query(
+  ): Promise<FoodRecord[]> {
+    const result = await this.pool.query<FoodRecord>(
       `SELECT id, name, brand, serving_unit, calories_per_100, protein_per_100,
             carbohydrates_per_100, fat_per_100, fiber_per_100, sodium_mg_per_100,
             calcium_mg_per_100, iron_mg_per_100, potassium_mg_per_100, magnesium_mg_per_100,
@@ -23,8 +28,11 @@ export class FoodRepository {
     return result.rows;
   }
 
-  async createFood(ownerId: string, food: any): Promise<any> {
-    const result = await this.pool.query(
+  async createFood(
+    ownerId: string,
+    food: CreateFoodInput,
+  ): Promise<FoodRecord> {
+    const result = await this.pool.query<FoodRecord>(
       `INSERT INTO foods (
        owner_id, name, brand, serving_unit, calories_per_100, protein_per_100,
        carbohydrates_per_100, fat_per_100, fiber_per_100, sodium_mg_per_100,
@@ -54,7 +62,11 @@ export class FoodRepository {
     return result.rows[0];
   }
 
-  async updateFood(ownerId: string, id: string, patch: any): Promise<any | null> {
+  async updateFood(
+    ownerId: string,
+    id: string,
+    patch: UpdateFoodPatch,
+  ): Promise<FoodRecord | null> {
     const columnNames: Record<string, string> = {
       name: "name",
       brand: "brand",
@@ -77,7 +89,7 @@ export class FoodRepository {
       ([key], index) => `${columnNames[key]} = $${index + 3}`,
     );
     const values = entries.map(([, value]) => value);
-    const result = await this.pool.query(
+    const result = await this.pool.query<FoodRecord>(
       `UPDATE foods SET ${assignments.join(", ")}, updated_at = now()
      WHERE owner_id = $1 AND id = $2 RETURNING *`,
       [ownerId, id, ...values],

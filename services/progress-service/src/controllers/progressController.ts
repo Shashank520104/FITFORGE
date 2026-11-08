@@ -80,32 +80,63 @@ export class ProgressController {
   logActivity = async (req: Request, res: Response): Promise<void> => {
     const parsed = activitySchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: { code: "INVALID_ACTIVITY", message: z.prettifyError(parsed.error) } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_ACTIVITY",
+          message: z.prettifyError(parsed.error),
+        },
+      });
       return;
     }
-    const data = await this.repository.logActivity(res.locals.ownerId, parsed.data);
+    const data = await this.repository.logActivity(
+      res.locals.ownerId,
+      parsed.data,
+    );
     res.status(201).json({ success: true, data });
   };
 
   logSleep = async (req: Request, res: Response): Promise<void> => {
     const parsed = sleepSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: { code: "INVALID_SLEEP", message: z.prettifyError(parsed.error) } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_SLEEP",
+          message: z.prettifyError(parsed.error),
+        },
+      });
       return;
     }
     const { sleepDate, bedtime, wakeTime, note } = parsed.data;
-    const durationMinutes = (timeInMinutes(wakeTime) - timeInMinutes(bedtime) + 1440) % 1440;
-    const data = await this.repository.logSleep(res.locals.ownerId, { sleepDate, bedtime, wakeTime, durationMinutes, note });
+    const durationMinutes =
+      (timeInMinutes(wakeTime) - timeInMinutes(bedtime) + 1440) % 1440;
+    const data = await this.repository.logSleep(res.locals.ownerId, {
+      sleepDate,
+      bedtime,
+      wakeTime,
+      durationMinutes,
+      note,
+    });
     res.status(201).json({ success: true, data });
   };
 
   getActivity = async (req: Request, res: Response): Promise<void> => {
     const date = z.iso.date().safeParse(req.query.date);
     if (!date.success) {
-      res.status(400).json({ success: false, error: { code: "INVALID_DATE", message: "A valid YYYY-MM-DD date is required" } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_DATE",
+          message: "A valid YYYY-MM-DD date is required",
+        },
+      });
       return;
     }
-    const data = await this.repository.getDailyActivitiesAndSleep(res.locals.ownerId, date.data);
+    const data = await this.repository.getDailyActivitiesAndSleep(
+      res.locals.ownerId,
+      date.data,
+    );
     res.status(200).json({ success: true, data });
   };
 
@@ -115,32 +146,62 @@ export class ProgressController {
     if (!from.success || !to.success || from.data > to.data) {
       res.status(400).json({
         success: false,
-        error: { code: "INVALID_DATE_RANGE", message: "Valid from and to dates are required, and from must not be after to" },
+        error: {
+          code: "INVALID_DATE_RANGE",
+          message:
+            "Valid from and to dates are required, and from must not be after to",
+        },
       });
       return;
     }
-    const rangeDays = (Date.parse(`${to.data}T00:00:00Z`) - Date.parse(`${from.data}T00:00:00Z`)) / 86400000 + 1;
+    const rangeDays =
+      (Date.parse(`${to.data}T00:00:00Z`) -
+        Date.parse(`${from.data}T00:00:00Z`)) /
+        86400000 +
+      1;
     if (rangeDays > 31) {
-      res.status(400).json({ success: false, error: { code: "INVALID_DATE_RANGE", message: "Activity summaries are limited to 31 days" } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_DATE_RANGE",
+          message: "Activity summaries are limited to 31 days",
+        },
+      });
       return;
     }
-    const data = await this.repository.getActivitySummary(res.locals.ownerId, from.data, to.data);
+    const data = await this.repository.getActivitySummary(
+      res.locals.ownerId,
+      from.data,
+      to.data,
+    );
     res.status(200).json({ success: true, data });
   };
 
   deleteActivity = async (req: Request, res: Response): Promise<void> => {
-    const deleted = await this.repository.deleteActivity(String(req.params.id), res.locals.ownerId);
+    const deleted = await this.repository.deleteActivity(
+      String(req.params.id),
+      res.locals.ownerId,
+    );
     if (!deleted) {
-      res.status(404).json({ success: false, error: { code: "ACTIVITY_NOT_FOUND", message: "Activity not found" } });
+      res.status(404).json({
+        success: false,
+        error: { code: "ACTIVITY_NOT_FOUND", message: "Activity not found" },
+      });
       return;
     }
     res.status(204).end();
   };
 
   deleteSleep = async (req: Request, res: Response): Promise<void> => {
-    const deleted = await this.repository.deleteSleep(String(req.params.id), res.locals.ownerId);
+    const deleted = await this.repository.deleteSleep(
+      String(req.params.id),
+      res.locals.ownerId,
+    );
     if (!deleted) {
-      res.status(404).json({ success: false, error: { code: "SLEEP_NOT_FOUND", message: "Sleep record not found" } });
+      res.status(404).json({
+        success: false,
+        error: { code: "SLEEP_NOT_FOUND", message: "Sleep record not found" },
+      });
       return;
     }
     res.status(204).end();
@@ -149,20 +210,46 @@ export class ProgressController {
   saveMeasurement = async (req: Request, res: Response): Promise<void> => {
     const parsed = measurementSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: { code: "INVALID_MEASUREMENT", message: z.prettifyError(parsed.error) } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_MEASUREMENT",
+          message: z.prettifyError(parsed.error),
+        },
+      });
       return;
     }
-    const data = await this.repository.saveMeasurement(res.locals.ownerId, parsed.data);
+    const data = await this.repository.saveMeasurement(
+      res.locals.ownerId,
+      parsed.data,
+    );
     res.status(201).json({ success: true, data });
   };
 
   getMeasurements = async (req: Request, res: Response): Promise<void> => {
     const page = positiveInteger(req.query.page, 1, 1000000);
     const limit = positiveInteger(req.query.limit, 100, 366);
-    const from = req.query.from === undefined ? undefined : z.iso.date().safeParse(req.query.from);
-    const to = req.query.to === undefined ? undefined : z.iso.date().safeParse(req.query.to);
-    if (page === null || limit === null || (from && !from.success) || (to && !to.success)) {
-      res.status(400).json({ success: false, error: { code: "INVALID_QUERY", message: "Measurement date range or pagination is invalid" } });
+    const from =
+      req.query.from === undefined
+        ? undefined
+        : z.iso.date().safeParse(req.query.from);
+    const to =
+      req.query.to === undefined
+        ? undefined
+        : z.iso.date().safeParse(req.query.to);
+    if (
+      page === null ||
+      limit === null ||
+      (from && !from.success) ||
+      (to && !to.success)
+    ) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_QUERY",
+          message: "Measurement date range or pagination is invalid",
+        },
+      });
       return;
     }
     const data = await this.repository.getMeasurements(
@@ -178,26 +265,57 @@ export class ProgressController {
   saveStrengthRecord = async (req: Request, res: Response): Promise<void> => {
     const parsed = strengthSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: { code: "INVALID_STRENGTH_RECORD", message: z.prettifyError(parsed.error) } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_STRENGTH_RECORD",
+          message: z.prettifyError(parsed.error),
+        },
+      });
       return;
     }
-    const result = await this.repository.saveStrengthRecord(res.locals.ownerId, parsed.data);
-    res.status(201).json({ success: true, data: result.data, isPersonalRecord: result.isPersonalRecord });
+    const result = await this.repository.saveStrengthRecord(
+      res.locals.ownerId,
+      parsed.data,
+    );
+    res.status(201).json({
+      success: true,
+      data: result.data,
+      isPersonalRecord: result.isPersonalRecord,
+    });
   };
 
   getStrengthRecords = async (req: Request, res: Response): Promise<void> => {
-    const name = typeof req.query.exercise === "string" ? req.query.exercise.trim() : "";
+    const name =
+      typeof req.query.exercise === "string" ? req.query.exercise.trim() : "";
     if (req.query.exercise !== undefined && (!name || name.length > 120)) {
-      res.status(400).json({ success: false, error: { code: "INVALID_QUERY", message: "Exercise filter must contain 1 to 120 characters" } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_QUERY",
+          message: "Exercise filter must contain 1 to 120 characters",
+        },
+      });
       return;
     }
     const page = positiveInteger(req.query.page, 1, 1000000);
     const limit = positiveInteger(req.query.limit, 100, 366);
     if (page === null || limit === null) {
-      res.status(400).json({ success: false, error: { code: "INVALID_QUERY", message: "Pagination parameters are invalid" } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_QUERY",
+          message: "Pagination parameters are invalid",
+        },
+      });
       return;
     }
-    const data = await this.repository.getStrengthRecords(res.locals.ownerId, name, limit, (page - 1) * limit);
+    const data = await this.repository.getStrengthRecords(
+      res.locals.ownerId,
+      name,
+      limit,
+      (page - 1) * limit,
+    );
     res.status(200).json({ success: true, data, pagination: { page, limit } });
   };
 

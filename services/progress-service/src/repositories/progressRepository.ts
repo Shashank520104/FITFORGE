@@ -1,9 +1,16 @@
 import { Pool } from "pg";
 import {
-  ActivityRecord,
+  ActivityInput,
+  ActivityRow,
+  ActivitySummaryRow,
+  DailyActivitiesAndSleep,
   Measurement,
-  SleepRecord,
+  MeasurementRow,
+  ProgressSummary,
+  SleepInput,
+  SleepRow,
   StrengthRecord,
+  StrengthRow,
 } from "../types/index.js";
 
 export class ProgressRepository {
@@ -11,16 +18,9 @@ export class ProgressRepository {
 
   async logActivity(
     ownerId: string,
-    data: {
-      activityDate: string;
-      activityTime: string;
-      activityType: string;
-      durationMinutes: number;
-      distanceKm?: number;
-      note?: string;
-    },
-  ): Promise<any> {
-    const result = await this.pool.query(
+    data: ActivityInput,
+  ): Promise<ActivityRow> {
+    const result = await this.pool.query<ActivityRow>(
       `INSERT INTO activity_logs
         (owner_id, activity_date, activity_time, activity_type, duration_minutes, distance_km, note)
        VALUES ($1,$2,$3,$4,$5,$6,$7)
@@ -38,17 +38,8 @@ export class ProgressRepository {
     return result.rows[0];
   }
 
-  async logSleep(
-    ownerId: string,
-    data: {
-      sleepDate: string;
-      bedtime: string;
-      wakeTime: string;
-      durationMinutes: number;
-      note?: string;
-    },
-  ): Promise<any> {
-    const result = await this.pool.query(
+  async logSleep(ownerId: string, data: SleepInput): Promise<SleepRow> {
+    const result = await this.pool.query<SleepRow>(
       `INSERT INTO sleep_logs
         (owner_id, sleep_date, bedtime, wake_time, duration_minutes, note)
        VALUES ($1,$2,$3,$4,$5,$6)
@@ -65,15 +56,18 @@ export class ProgressRepository {
     return result.rows[0];
   }
 
-  async getDailyActivitiesAndSleep(ownerId: string, date: string): Promise<any> {
+  async getDailyActivitiesAndSleep(
+    ownerId: string,
+    date: string,
+  ): Promise<DailyActivitiesAndSleep> {
     const [activities, sleep] = await Promise.all([
-      this.pool.query(
+      this.pool.query<ActivityRow>(
         `SELECT id, activity_date, activity_time, activity_type, duration_minutes, distance_km, note, source, created_at
          FROM activity_logs WHERE owner_id = $1 AND activity_date = $2
          ORDER BY activity_time, created_at`,
         [ownerId, date],
       ),
-      this.pool.query(
+      this.pool.query<SleepRow>(
         `SELECT id, sleep_date, bedtime, wake_time, duration_minutes, note, source, created_at
          FROM sleep_logs WHERE owner_id = $1 AND sleep_date = $2
          ORDER BY created_at`,
@@ -94,8 +88,12 @@ export class ProgressRepository {
     };
   }
 
-  async getActivitySummary(ownerId: string, from: string, to: string): Promise<any[]> {
-    const result = await this.pool.query(
+  async getActivitySummary(
+    ownerId: string,
+    from: string,
+    to: string,
+  ): Promise<ActivitySummaryRow[]> {
+    const result = await this.pool.query<ActivitySummaryRow>(
       `WITH days AS (
          SELECT generate_series($2::date, $3::date, interval '1 day')::date AS summary_date
        ),
@@ -145,8 +143,11 @@ export class ProgressRepository {
     return (result.rowCount ?? 0) > 0;
   }
 
-  async saveMeasurement(ownerId: string, data: Measurement): Promise<any> {
-    const result = await this.pool.query(
+  async saveMeasurement(
+    ownerId: string,
+    data: Measurement,
+  ): Promise<MeasurementRow> {
+    const result = await this.pool.query<MeasurementRow>(
       `INSERT INTO body_measurements (owner_id, measured_on, weight_kg, body_fat_percent, note)
      VALUES ($1,$2,$3,$4,$5)
      ON CONFLICT (owner_id, measured_on) DO UPDATE
@@ -171,8 +172,8 @@ export class ProgressRepository {
     to: string | null,
     limit: number,
     offset: number,
-  ): Promise<any[]> {
-    const result = await this.pool.query(
+  ): Promise<MeasurementRow[]> {
+    const result = await this.pool.query<MeasurementRow>(
       `SELECT id, measured_on, weight_kg, body_fat_percent, note
      FROM body_measurements
      WHERE owner_id = $1
@@ -188,7 +189,7 @@ export class ProgressRepository {
   async saveStrengthRecord(
     ownerId: string,
     record: StrengthRecord,
-  ): Promise<{ data: any; isPersonalRecord: boolean }> {
+  ): Promise<{ data: StrengthRow; isPersonalRecord: boolean }> {
     const client = await this.pool.connect();
     try {
       await client.query("BEGIN");
@@ -205,7 +206,7 @@ export class ProgressRepository {
       );
       const previousBest = Number(previous.rows[0]?.max_weight ?? 0);
       const isPersonalRecord = record.weightKg > previousBest;
-      const created = await client.query(
+      const created = await client.query<StrengthRow>(
         `INSERT INTO strength_records
         (owner_id, exercise_name, exercise_id, performed_at, weight_kg, repetitions, note)
        VALUES ($1,$2,$3,$4,$5,$6,$7)
@@ -235,8 +236,8 @@ export class ProgressRepository {
     exerciseName: string,
     limit: number,
     offset: number,
-  ): Promise<any[]> {
-    const result = await this.pool.query(
+  ): Promise<StrengthRow[]> {
+    const result = await this.pool.query<StrengthRow>(
       `SELECT id, exercise_name, exercise_id, performed_at, weight_kg, repetitions, note
      FROM strength_records
      WHERE owner_id = $1 AND ($2 = '' OR lower(exercise_name) = lower($2))
@@ -247,15 +248,24 @@ export class ProgressRepository {
     return result.rows;
   }
 
-  async getProgressSummary(ownerId: string): Promise<any> {
+  async getProgressSummary(ownerId: string): Promise<ProgressSummary> {
     const [measurements, personalRecords] = await Promise.all([
-      this.pool.query(
+      this.pool.query<{
+        measured_on: string;
+        weight_kg: number;
+        body_fat_percent: number | null;
+      }>(
         `SELECT measured_on, weight_kg, body_fat_percent
        FROM body_measurements WHERE owner_id = $1
         ORDER BY measured_on DESC LIMIT 366`,
         [ownerId],
       ),
-      this.pool.query(
+      this.pool.query<{
+        exercise_name: string;
+        performed_at: string;
+        weight_kg: number;
+        repetitions: number;
+      }>(
         `SELECT DISTINCT ON (lower(exercise_name))
          exercise_name, performed_at, weight_kg, repetitions
        FROM strength_records WHERE owner_id = $1

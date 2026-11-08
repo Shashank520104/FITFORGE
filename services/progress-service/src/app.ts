@@ -58,14 +58,18 @@ export function createProgressApp(
 
   // Probes
   app.get("/health", (_req, res) => {
-    res.status(200).json({ success: true, service: "progress-service", status: "healthy" });
+    res
+      .status(200)
+      .json({ success: true, service: "progress-service", status: "healthy" });
   });
 
   app.get(
     "/ready",
     asyncRoute(async (_req, res) => {
       await pool.query("SELECT 1");
-      res.status(200).json({ success: true, service: "progress-service", status: "ready" });
+      res
+        .status(200)
+        .json({ success: true, service: "progress-service", status: "ready" });
     }),
   );
 
@@ -73,8 +77,16 @@ export function createProgressApp(
   const repository = new ProgressRepository(pool);
   const controller = new ProgressController(repository);
 
-  app.use("/api/v1/progress", verifyToken(config.JWT_SECRET), createProgressRouter(controller));
-  app.use("/api/v1/activity", verifyToken(config.JWT_SECRET), createActivityRouter(controller));
+  app.use(
+    "/api/v1/progress",
+    verifyToken(config.JWT_SECRET),
+    createProgressRouter(controller),
+  );
+  app.use(
+    "/api/v1/activity",
+    verifyToken(config.JWT_SECRET),
+    createActivityRouter(controller),
+  );
 
   // 404
   app.use((_req, res) => {

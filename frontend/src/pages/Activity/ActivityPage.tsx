@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type FormEvent,
-} from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ActivityMinutesChart } from "../../components/charts/ActivityMinutesChart.js";
 import { SleepTrendChart } from "../../components/charts/SleepTrendChart.js";
 import { Notice } from "../../components/common/Notice.js";

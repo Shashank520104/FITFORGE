@@ -88,7 +88,7 @@ export function useApi(
 ) {
   const request = useAuthenticatedRequest(session, setSession);
   return useCallback(
-    async <T,>(path: string, init: RequestInit = {}): Promise<T> =>
+    async <T>(path: string, init: RequestInit = {}): Promise<T> =>
       readResponse<T>(await request(path, init)),
     [request],
   );

@@ -80,16 +80,32 @@ export class PersonalizationController {
     const ownerId = this.getOwnerId(res);
     const contentType = req.header("content-type")?.split(";")[0].trim();
     if (!contentType || !mediaTypes.has(contentType)) {
-      throw new HttpError(415, "UNSUPPORTED_REPORT_TYPE", "Upload a PDF, JPEG, or PNG report.");
+      throw new HttpError(
+        415,
+        "UNSUPPORTED_REPORT_TYPE",
+        "Upload a PDF, JPEG, or PNG report.",
+      );
     }
     if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
-      throw new HttpError(400, "EMPTY_REPORT", "The uploaded report is empty or could not be read.");
+      throw new HttpError(
+        400,
+        "EMPTY_REPORT",
+        "The uploaded report is empty or could not be read.",
+      );
     }
     if (req.body.length > 8 * 1024 * 1024) {
-      throw new HttpError(413, "REPORT_TOO_LARGE", "Reports must be 8 MB or smaller.");
+      throw new HttpError(
+        413,
+        "REPORT_TOO_LARGE",
+        "Reports must be 8 MB or smaller.",
+      );
     }
     if (sniffMediaType(req.body) !== contentType) {
-      throw new HttpError(400, "REPORT_TYPE_MISMATCH", "The file contents do not match the selected report type.");
+      throw new HttpError(
+        400,
+        "REPORT_TYPE_MISMATCH",
+        "The file contents do not match the selected report type.",
+      );
     }
 
     const result = await this.service.uploadReport(

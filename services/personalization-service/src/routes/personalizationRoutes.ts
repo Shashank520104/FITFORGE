@@ -1,4 +1,4 @@
-import express, { RequestHandler, Router } from "express";
+import { RequestHandler, Router } from "express";
 import { PersonalizationController } from "../controllers/personalizationController.js";
 
 function asyncRoute(handler: RequestHandler): RequestHandler {
@@ -19,7 +19,10 @@ export function createPersonalizationRouter(
   // Report endpoints
   router.get("/reports", asyncRoute(controller.listReports));
   router.post("/reports", asyncRoute(controller.uploadReport));
-  router.post("/reports/:reportId/summary", asyncRoute(controller.summarizeReport));
+  router.post(
+    "/reports/:reportId/summary",
+    asyncRoute(controller.summarizeReport),
+  );
   router.delete("/reports/:reportId", asyncRoute(controller.deleteReport));
 
   // Plan endpoints

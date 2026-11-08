@@ -54,14 +54,18 @@ export function createProfileApp(
 
   // Probes
   app.get("/health", (_req, res) => {
-    res.status(200).json({ success: true, service: "profile-service", status: "healthy" });
+    res
+      .status(200)
+      .json({ success: true, service: "profile-service", status: "healthy" });
   });
 
   app.get(
     "/ready",
     asyncRoute(async (_req, res) => {
       await pool.query("SELECT 1");
-      res.status(200).json({ success: true, service: "profile-service", status: "ready" });
+      res
+        .status(200)
+        .json({ success: true, service: "profile-service", status: "ready" });
     }),
   );
 
@@ -69,7 +73,11 @@ export function createProfileApp(
   const repository = new ProfileRepository(pool);
   const controller = new ProfileController(repository);
 
-  app.use("/api/v1/profile", verifyToken(config.JWT_SECRET), createProfileRouter(controller));
+  app.use(
+    "/api/v1/profile",
+    verifyToken(config.JWT_SECRET),
+    createProfileRouter(controller),
+  );
 
   // 404
   app.use((_req, res) => {

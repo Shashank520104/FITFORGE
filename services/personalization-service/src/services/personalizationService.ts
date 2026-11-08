@@ -45,9 +45,17 @@ export class PersonalizationService {
     fileBuffer: Buffer,
     contentType: string,
     rawFilename: string | undefined,
-  ): Promise<{ id: string; filename: string; mediaType: string; fileSize: number }> {
+  ): Promise<{
+    id: string;
+    filename: string;
+    mediaType: string;
+    fileSize: number;
+  }> {
     const filename = this.sanitizeFilename(rawFilename);
-    const encrypted = encryptReport(fileBuffer, this.config.REPORT_ENCRYPTION_KEY);
+    const encrypted = encryptReport(
+      fileBuffer,
+      this.config.REPORT_ENCRYPTION_KEY,
+    );
     const id = randomUUID();
 
     await this.repository.saveEncryptedReport(
@@ -72,7 +80,12 @@ export class PersonalizationService {
   async summarizeReport(
     ownerId: string,
     reportId: string,
-  ): Promise<{ reportId: string; summary: string; note: string; provider: string }> {
+  ): Promise<{
+    reportId: string;
+    summary: string;
+    note: string;
+    provider: string;
+  }> {
     const report = await this.repository.getEncryptedReport(reportId, ownerId);
     if (!report) {
       throw new HttpError(404, "REPORT_NOT_FOUND", "Report was not found.");
@@ -165,13 +178,21 @@ export class PersonalizationService {
 
   private sanitizeFilename(value: string | undefined): string {
     if (!value) {
-      throw new HttpError(400, "INVALID_REPORT_NAME", "A report filename is required");
+      throw new HttpError(
+        400,
+        "INVALID_REPORT_NAME",
+        "A report filename is required",
+      );
     }
     let decoded: string;
     try {
       decoded = decodeURIComponent(value);
     } catch {
-      throw new HttpError(400, "INVALID_REPORT_NAME", "The report filename is invalid");
+      throw new HttpError(
+        400,
+        "INVALID_REPORT_NAME",
+        "The report filename is invalid",
+      );
     }
     const filename = decoded
       .replace(/[\\/]/g, "_")
@@ -179,7 +200,11 @@ export class PersonalizationService {
       .trim()
       .slice(0, 120);
     if (!filename || filename === "." || filename === "..") {
-      throw new HttpError(400, "INVALID_REPORT_NAME", "The report filename is invalid");
+      throw new HttpError(
+        400,
+        "INVALID_REPORT_NAME",
+        "The report filename is invalid",
+      );
     }
     return filename;
   }

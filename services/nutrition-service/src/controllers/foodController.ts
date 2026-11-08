@@ -97,14 +97,27 @@ export class FoodController {
         : typeof req.query.search === "string"
           ? req.query.search.trim()
           : null;
-    if (page === null || limit === null || search === null || search.length > 100) {
+    if (
+      page === null ||
+      limit === null ||
+      search === null ||
+      search.length > 100
+    ) {
       res.status(400).json({
         success: false,
-        error: { code: "INVALID_QUERY", message: "Food search or pagination parameters are invalid" },
+        error: {
+          code: "INVALID_QUERY",
+          message: "Food search or pagination parameters are invalid",
+        },
       });
       return;
     }
-    const data = await this.repository.listFoods(ownerId, search, limit, (page - 1) * limit);
+    const data = await this.repository.listFoods(
+      ownerId,
+      search,
+      limit,
+      (page - 1) * limit,
+    );
     res.status(200).json({ success: true, data, pagination: { page, limit } });
   };
 
@@ -126,17 +139,29 @@ export class FoodController {
     const ownerId = res.locals.identity.id;
     const id = idFrom(req.params.id);
     if (!id) {
-      res.status(400).json({ success: false, error: { code: "INVALID_FOOD_ID", message: "Food ID must be a UUID" } });
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_FOOD_ID", message: "Food ID must be a UUID" },
+      });
       return;
     }
     const parsed = foodPatchSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: { code: "INVALID_FOOD", message: z.prettifyError(parsed.error) } });
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "INVALID_FOOD",
+          message: z.prettifyError(parsed.error),
+        },
+      });
       return;
     }
     const data = await this.repository.updateFood(ownerId, id, parsed.data);
     if (!data) {
-      res.status(404).json({ success: false, error: { code: "FOOD_NOT_FOUND", message: "Food not found" } });
+      res.status(404).json({
+        success: false,
+        error: { code: "FOOD_NOT_FOUND", message: "Food not found" },
+      });
       return;
     }
     res.status(200).json({ success: true, data });
@@ -146,18 +171,27 @@ export class FoodController {
     const ownerId = res.locals.identity.id;
     const id = idFrom(req.params.id);
     if (!id) {
-      res.status(400).json({ success: false, error: { code: "INVALID_FOOD_ID", message: "Food ID must be a UUID" } });
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_FOOD_ID", message: "Food ID must be a UUID" },
+      });
       return;
     }
     const deleted = await this.repository.deleteFood(ownerId, id);
     if (!deleted) {
-      res.status(404).json({ success: false, error: { code: "FOOD_NOT_FOUND", message: "Food not found" } });
+      res.status(404).json({
+        success: false,
+        error: { code: "FOOD_NOT_FOUND", message: "Food not found" },
+      });
       return;
     }
     res.status(204).end();
   };
 
-  checkEstimateAvailability = async (_req: Request, res: Response): Promise<void> => {
+  checkEstimateAvailability = async (
+    _req: Request,
+    res: Response,
+  ): Promise<void> => {
     const available = await this.aiService.checkModelAvailability();
     res.status(200).json({ success: true, data: { available } });
   };
@@ -167,11 +201,17 @@ export class FoodController {
     if (!parsed.success) {
       res.status(400).json({
         success: false,
-        error: { code: "INVALID_FOOD_ESTIMATE", message: z.prettifyError(parsed.error) },
+        error: {
+          code: "INVALID_FOOD_ESTIMATE",
+          message: z.prettifyError(parsed.error),
+        },
       });
       return;
     }
-    const data = await this.aiService.estimateFood(parsed.data.name, parsed.data.servingUnit);
+    const data = await this.aiService.estimateFood(
+      parsed.data.name,
+      parsed.data.servingUnit,
+    );
     res.status(200).json({ success: true, data });
   };
 }

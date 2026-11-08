@@ -190,8 +190,7 @@ export class AiService {
 
     let dietRows: z.infer<typeof compactDietPlanSchema>["days"];
     let movementRows:
-      | z.infer<typeof compactWorkoutPlanSchema>["movement"]
-      | undefined;
+      z.infer<typeof compactWorkoutPlanSchema>["movement"] | undefined;
 
     if (exerciseCleared) {
       const compactPlan = compactWorkoutPlanSchema.safeParse(generated);
@@ -222,36 +221,142 @@ export class AiService {
         Array<{ f: string; a: string; m: number; g: string }>
       > = {
         beginner: [
-          { f: "Upper Body Light", a: "Wall Push-ups & Arm Circles", m: 20, g: "Keep movements slow and controlled with steady breathing." },
-          { f: "Lower Body & Mobility", a: "Bodyweight Sit-to-Stands", m: 20, g: "Focus on comfortable hip alignment and balance." },
-          { f: "Cardio & Walk", a: "Brisk Neighborhood Walk", m: 25, g: "Maintain an easy, conversational pace." },
-          { f: "Rest & Active Recovery", a: "Rest", m: 0, g: "Take a full rest day or do gentle leisure movement." },
-          { f: "Core & Posture", a: "Bird-Dog & Glute Bridges", m: 20, g: "Engage core and keep spine neutral." },
-          { f: "Flexibility & Flow", a: "Gentle Full-Body Stretch", m: 20, g: "Breathe deeply into each stretch without straining." },
-          { f: "Rest & Recovery", a: "Rest", m: 0, g: "Complete rest and hydration to restore energy." },
+          {
+            f: "Upper Body Light",
+            a: "Wall Push-ups & Arm Circles",
+            m: 20,
+            g: "Keep movements slow and controlled with steady breathing.",
+          },
+          {
+            f: "Lower Body & Mobility",
+            a: "Bodyweight Sit-to-Stands",
+            m: 20,
+            g: "Focus on comfortable hip alignment and balance.",
+          },
+          {
+            f: "Cardio & Walk",
+            a: "Brisk Neighborhood Walk",
+            m: 25,
+            g: "Maintain an easy, conversational pace.",
+          },
+          {
+            f: "Rest & Active Recovery",
+            a: "Rest",
+            m: 0,
+            g: "Take a full rest day or do gentle leisure movement.",
+          },
+          {
+            f: "Core & Posture",
+            a: "Bird-Dog & Glute Bridges",
+            m: 20,
+            g: "Engage core and keep spine neutral.",
+          },
+          {
+            f: "Flexibility & Flow",
+            a: "Gentle Full-Body Stretch",
+            m: 20,
+            g: "Breathe deeply into each stretch without straining.",
+          },
+          {
+            f: "Rest & Recovery",
+            a: "Rest",
+            m: 0,
+            g: "Complete rest and hydration to restore energy.",
+          },
         ],
         intermediate: [
-          { f: "Upper Body Strength", a: "Push-ups & Plank Holds", m: 25, g: "Maintain straight torso and engage shoulder blades." },
-          { f: "Lower Body & Legs", a: "Bodyweight Squats & Lunges", m: 30, g: "Drive through heels and keep knees aligned over toes." },
-          { f: "Core & Cardio", a: "Interval Walking or Light Jog", m: 25, g: "Alternate moderate pace with brisk intervals." },
-          { f: "Rest & Active Recovery", a: "Rest", m: 0, g: "Gentle walking or relaxed stretching if desired." },
-          { f: "Core & Back Stability", a: "Planks, Supermans & Bird-Dogs", m: 25, g: "Hold positions with steady, controlled breathing." },
-          { f: "Mobility & Yoga", a: "Dynamic Mobility Flow", m: 25, g: "Open hips and thoracic spine with deep breaths." },
-          { f: "Rest & Recovery", a: "Rest", m: 0, g: "Full rest day to recover muscles for the next week." },
+          {
+            f: "Upper Body Strength",
+            a: "Push-ups & Plank Holds",
+            m: 25,
+            g: "Maintain straight torso and engage shoulder blades.",
+          },
+          {
+            f: "Lower Body & Legs",
+            a: "Bodyweight Squats & Lunges",
+            m: 30,
+            g: "Drive through heels and keep knees aligned over toes.",
+          },
+          {
+            f: "Core & Cardio",
+            a: "Interval Walking or Light Jog",
+            m: 25,
+            g: "Alternate moderate pace with brisk intervals.",
+          },
+          {
+            f: "Rest & Active Recovery",
+            a: "Rest",
+            m: 0,
+            g: "Gentle walking or relaxed stretching if desired.",
+          },
+          {
+            f: "Core & Back Stability",
+            a: "Planks, Supermans & Bird-Dogs",
+            m: 25,
+            g: "Hold positions with steady, controlled breathing.",
+          },
+          {
+            f: "Mobility & Yoga",
+            a: "Dynamic Mobility Flow",
+            m: 25,
+            g: "Open hips and thoracic spine with deep breaths.",
+          },
+          {
+            f: "Rest & Recovery",
+            a: "Rest",
+            m: 0,
+            g: "Full rest day to recover muscles for the next week.",
+          },
         ],
         advanced: [
-          { f: "Upper Body Calisthenics", a: "Diamond Push-ups & Pike Push-ups", m: 35, g: "Control tempo and achieve full range of motion." },
-          { f: "Lower Body Power", a: "Jump Squats & Bulgarian Split Squats", m: 35, g: "Explosive upward drive with soft, balanced landing." },
-          { f: "Cardio Conditioning", a: "Tempo Walk or Interval Run", m: 30, g: "Push cadence during intervals and recover smoothly." },
-          { f: "Rest & Active Recovery", a: "Rest", m: 0, g: "Low-intensity mobility or full recovery." },
-          { f: "Core & Functional Movement", a: "Hollow Holds & Bear Crawls", m: 30, g: "Keep core locked and movements deliberate." },
-          { f: "Deep Mobility & Flexibility", a: "Comprehensive Yoga Flow", m: 30, g: "Deep stretches to enhance joint range of motion." },
-          { f: "Rest & Recovery", a: "Rest", m: 0, g: "Full physical rest and recovery." },
+          {
+            f: "Upper Body Calisthenics",
+            a: "Diamond Push-ups & Pike Push-ups",
+            m: 35,
+            g: "Control tempo and achieve full range of motion.",
+          },
+          {
+            f: "Lower Body Power",
+            a: "Jump Squats & Bulgarian Split Squats",
+            m: 35,
+            g: "Explosive upward drive with soft, balanced landing.",
+          },
+          {
+            f: "Cardio Conditioning",
+            a: "Tempo Walk or Interval Run",
+            m: 30,
+            g: "Push cadence during intervals and recover smoothly.",
+          },
+          {
+            f: "Rest & Active Recovery",
+            a: "Rest",
+            m: 0,
+            g: "Low-intensity mobility or full recovery.",
+          },
+          {
+            f: "Core & Functional Movement",
+            a: "Hollow Holds & Bear Crawls",
+            m: 30,
+            g: "Keep core locked and movements deliberate.",
+          },
+          {
+            f: "Deep Mobility & Flexibility",
+            a: "Comprehensive Yoga Flow",
+            m: 30,
+            g: "Deep stretches to enhance joint range of motion.",
+          },
+          {
+            f: "Rest & Recovery",
+            a: "Rest",
+            m: 0,
+            g: "Full physical rest and recovery.",
+          },
         ],
       };
 
       const template =
-        defaultWorkouts[profile.experienceLevel] ?? defaultWorkouts.intermediate;
+        defaultWorkouts[profile.experienceLevel] ??
+        defaultWorkouts.intermediate;
 
       movementRows = movementRows.map((row, index) => {
         let f = (row.f || "").trim();
@@ -316,11 +421,13 @@ export class AiService {
     }));
 
     const workoutDays: WorkoutDay[] | null = exerciseCleared
-      ? movementRows?.map(({ f: focus, a: name, m: minutes, g: guidance }, index) => ({
-          day: index + 1,
-          focus,
-          activities: minutes === 0 ? [] : [{ name, minutes, guidance }],
-        })) ?? null
+      ? (movementRows?.map(
+          ({ f: focus, a: name, m: minutes, g: guidance }, index) => ({
+            day: index + 1,
+            focus,
+            activities: minutes === 0 ? [] : [{ name, minutes, guidance }],
+          }),
+        ) ?? null)
       : null;
 
     return {
