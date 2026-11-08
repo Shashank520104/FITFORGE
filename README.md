@@ -9,6 +9,15 @@
 
 FITFORGE is an enterprise-grade fitness and nutrition intelligence platform built with a distributed microservices architecture. It features an API Gateway, independently runnable and containerized authentication, workout, nutrition, progress, profile, and personalization services, alongside a responsive React 19 web application with interactive D3 data visualizations.
 
+> ### 🌐 Live Demo & Recruiter Preview
+>
+> - **Live Web Application**: [https://a689754805a9c9.lhr.life](https://a689754805a9c9.lhr.life)
+> - **Interactive Swagger API Documentation**: [https://a689754805a9c9.lhr.life/docs/](https://a689754805a9c9.lhr.life/docs/)
+> - **Pre-seeded Recruiter Account**:
+>   - **Email**: `demo@fitforge.dev`
+>   - **Password**: `SecurePassword123!`
+>     _(You can also register a fresh account directly on the live app)_
+
 ## Application Showcase
 
 |                Overview & Weekly Momentum                 |              D3 Weight & Progress Analytics               |
