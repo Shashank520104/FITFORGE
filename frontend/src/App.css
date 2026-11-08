@@ -1,3 +1,26 @@
+/**
+ * ==============================================================================
+ * FITFORGE Corporate UI Architecture & Design System Stylesheet
+ * ==============================================================================
+ * Section Index:
+ *  1. Landing & Authentication (Public Header, Hero Copy, Auth Cards)
+ *  2. Application Shell & Navigation (Sidebar, Topbar, Mobile Navigation)
+ *  3. Common Components & Surfaces (Stat Cards, Notices, Empty States, Buttons)
+ *  4. Dashboard / Overview Page (Hero Banner, Weekly Momentum Ring)
+ *  5. Training Plans & Interactive Workout Session Logger (Sets, Rest Timer)
+ *  6. Exercise Library (Movement Chips, Search, Filter Grid)
+ *  7. Nutrition Log & Food Management (Macro Cards, AI Estimator, Meal Sections)
+ *  8. Activity & Sleep Tracker (Manual Log Forms, D3 SVG Timeline Visualizations)
+ *  9. Wellness Space (Profile Customization, Encrypted Reports, 7-Day Guide)
+ * 10. Progress Tracking & Analytical Charts (Weight Trend, Strength PRs)
+ * 11. AI Coach Chat & Streaming Interface (Message Bubbles, Prompt Pills)
+ * 12. Account Preferences & Responsive Media Breakpoints
+ * ==============================================================================
+ */
+
+/* -------------------------------------------------------------------------- */
+/* 1. Landing & Authentication                                                */
+/* -------------------------------------------------------------------------- */
 .landing {
   min-height: 100vh;
   padding: 0 6vw;
@@ -5,6 +28,7 @@
   flex-direction: column;
 }
 .public-header {
+
   height: 82px;
   display: flex;
   align-items: center;
@@ -3809,6 +3833,45 @@ select:focus,
 }
 .wellness-day-picker strong {
   font-size: 16px;
+}
+.wellness-day-tag {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wellness-day-tag.active {
+  background: #e3ede3;
+  color: #2e603e;
+}
+.wellness-day-tag.rest {
+  background: #ebebe5;
+  color: #72756d;
+}
+.wellness-rest-card {
+  padding: 14px 15px;
+  border: 1px solid #edf0eb;
+  border-radius: 12px;
+  background: #fbfcf9;
+}
+.wellness-rest-card strong {
+  display: block;
+  color: #455449;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.wellness-rest-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
 }
 .wellness-day-content {
   display: grid;
