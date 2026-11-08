@@ -9,6 +9,16 @@
 
 FITFORGE is an enterprise-grade fitness and nutrition intelligence platform built with a distributed microservices architecture. It features an API Gateway, independently runnable and containerized authentication, workout, nutrition, progress, profile, and personalization services, alongside a responsive React 19 web application with interactive D3 data visualizations.
 
+## Application Showcase
+
+|                Overview & Weekly Momentum                 |              D3 Weight & Progress Analytics               |
+| :-------------------------------------------------------: | :-------------------------------------------------------: |
+| ![Dashboard Overview](docs/assets/dashboard-overview.png) | ![Progress Analytics](docs/assets/progress-analytics.png) |
+
+|              Activity & Sleep Tracking              |           Privacy-First AI Wellness Planner           |
+| :-------------------------------------------------: | :---------------------------------------------------: |
+| ![Activity & Sleep](docs/assets/activity-sleep.png) | ![Wellness & AI Planner](docs/assets/wellness-ai.png) |
+
 ## Current architecture
 
 ```mermaid
