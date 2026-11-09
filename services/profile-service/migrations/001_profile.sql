@@ -1,4 +1,4 @@
-0CREATE TABLE IF NOT EXISTS user_profiles (
+CREATE TABLE IF NOT EXISTS user_profiles (
   owner_id UUID PRIMARY KEY,
   display_name TEXT CHECK (display_name IS NULL OR char_length(display_name) BETWEEN 1 AND 80),
   units TEXT NOT NULL DEFAULT 'metric' CHECK (units IN ('metric', 'imperial')),
