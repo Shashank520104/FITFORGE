@@ -39,16 +39,29 @@ async function startServer(): Promise<void> {
       new URL("../openapi.yaml", import.meta.url),
       "utf8",
     );
-    const server: Server = createGatewayApp(
+    const app = createGatewayApp(
       config,
       rateLimitStore,
       openApiDocument,
-    ).listen(config.PORT);
+    );
+    const server: Server = app.listen(config.PORT);
     await new Promise<void>((resolve, reject) => {
       server.once("error", reject);
       server.once("listening", resolve);
     });
     console.log(`API Gateway listening on port ${config.PORT}`);
+
+    // Also bind fallback port (3000 or 10000) to ensure Render connects regardless of EXPOSE/PORT mapping
+    const fallbackPort = config.PORT === 10000 ? 3000 : 10000;
+    try {
+      const fallbackServer = app.listen(fallbackPort);
+      fallbackServer.once("listening", () => {
+        console.log(`API Gateway also listening on fallback port ${fallbackPort}`);
+      });
+      fallbackServer.once("error", (err) => {
+        console.warn(`Optional fallback port ${fallbackPort} not bound:`, (err as Error).message);
+      });
+    } catch {}
 
     const shutdown = (signal: NodeJS.Signals): void => {
       console.log(`API Gateway received ${signal}; shutting down`);
