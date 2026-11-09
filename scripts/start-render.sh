@@ -20,6 +20,9 @@ echo "--> Starting microservices on loopback ports..."
 (cd services/profile-service && PORT=3006 node dist/index.js) &
 (cd services/personalization-service && PORT=3007 node dist/index.js) &
 
+echo "--> Waiting for microservices to bind to loopback ports..."
+sleep 2
+
 # 3. Export internal loopback URLs for the API Gateway
 export AUTH_SERVICE_URL="http://127.0.0.1:3002"
 export WORKOUT_SERVICE_URL="http://127.0.0.1:3001"

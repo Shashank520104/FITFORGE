@@ -33,14 +33,27 @@ async function startServer(): Promise<void> {
     if (!jwtSecret || jwtSecret.length < 32) {
       throw new Error("JWT_SECRET must contain at least 32 characters");
     }
-    if (!redisUrl) throw new Error("REDIS_URL is missing from environment");
 
     await connectDB();
-    queueRedis = new Redis(redisUrl, { maxRetriesPerRequest: null });
-    const cacheRedis = new Redis(redisUrl);
-    cache = new RedisCacheStore(cacheRedis);
-    await Promise.all([queueRedis.ping(), cache.waitUntilReady()]);
-    insightsQueue = new BullWorkoutInsightsQueue(queueRedis);
+
+    if (redisUrl && !redisUrl.includes("localhost")) {
+      try {
+        queueRedis = new Redis(redisUrl, { maxRetriesPerRequest: null, connectTimeout: 5000 });
+        const cacheRedis = new Redis(redisUrl, { connectTimeout: 5000 });
+        cache = new RedisCacheStore(cacheRedis);
+        await Promise.all([queueRedis.ping(), cache.waitUntilReady()]);
+        insightsQueue = new BullWorkoutInsightsQueue(queueRedis);
+        console.log("Workout Service connected to Redis for cache & queues");
+      } catch (redisError) {
+        console.warn(
+          "Workout Service Redis unavailable; proceeding without background cache/queues:",
+          redisError instanceof Error ? redisError.message : String(redisError),
+        );
+      }
+    } else {
+      console.log("Workout Service running without Redis");
+    }
+
     await seedExerciseCatalog();
 
     server = createWorkoutApp(jwtSecret, { cache, insightsQueue }).listen(port);
